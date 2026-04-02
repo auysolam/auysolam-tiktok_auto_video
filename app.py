@@ -19,110 +19,108 @@ st.markdown("""
         font-family: 'Prompt', sans-serif !important;
     }
     
-    /* ซ่อน Header และ Footer พื้นฐานของ Streamlit เพื่อให้ดูคล้าย Native App มากขึ้น */
+    /* ซ่อน Header และ Footer พื้นฐานของ Streamlit */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
 
-    /* พื้นหลังแบบ Dark/Glassmorphism เบาๆ ให้ดูล้ำลึก */
+    /* พื้นหลังแบบ Dark Theme เรียบหรู สะอาดตา (พรีเมียมแบบ Flat) */
     .stApp {
-        background-color: #0f1115;
-        background-image: 
-            radial-gradient(circle at 15% 50%, rgba(20, 30, 48, 0.4), transparent 50%),
-            radial-gradient(circle at 85% 30%, rgba(255, 0, 80, 0.1), transparent 50%),
-            radial-gradient(circle at 50% -20%, rgba(0, 242, 254, 0.15), transparent 50%);
+        background-color: #121212;
     }
 
-    /* ปรับแต่งปุ่มให้ดูโดดเด่น เด้ง และน่าสัมผัส */
+    /* ปรับแต่งปุ่มให้ดูโดดเด่นแต่เรียบง่าย ไม่เรืองแสง */
     .stButton > button {
-        background: linear-gradient(135deg, #ff0050 0%, #00f2fe 100%);
+        background-color: #333333;
         color: white !important;
-        border-radius: 999px; /* ปรับให้กลมมนคล้ายปุ่ม iOS/Android ยุคใหม่ */
-        border: none;
+        border-radius: 8px; /* โค้งมนกำลังดี */
+        border: 1px solid #444444;
         padding: 0.75rem 1.5rem;
-        font-weight: 600;
+        font-weight: 500;
         font-size: 1.05rem;
         letter-spacing: 0.5px;
-        box-shadow: 0 8px 20px rgba(255, 0, 80, 0.25);
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        transition: all 0.2s ease;
     }
     .stButton > button:hover {
-        transform: translateY(-3px) scale(1.02);
-        box-shadow: 0 12px 25px rgba(0, 242, 254, 0.35) !important;
+        background-color: #4a4a4a;
+        border-color: #666666;
     }
     .stButton > button:active {
-        transform: translateY(1px) scale(0.98);
-        box-shadow: 0 4px 10px rgba(255, 0, 80, 0.2) !important;
+        background-color: #2a2a2a;
+        transform: translateY(1px);
+    }
+    
+    /* เน้นปุ่มหลัก (Primary Button) ให้เป็นสีหลักของแอป เช่น ชมพู TikTok หม่นๆ เพื่อความมินิมอล */
+    button[kind="primary"] {
+        background-color: #e62e5c !important;
+        border-color: #e62e5c !important;
+    }
+    button[kind="primary"]:hover {
+        background-color: #d12250 !important;
     }
 
-    /* กล่องข้อมูล (Inputs, Selectbox, Uploader, Text Area) ให้ดูแพงคล้าย Glassmorphism */
+    /* กล่องข้อมูล (Inputs, Selectbox, Uploader, Text Area) เรียบหรูไม่เรืองแสง */
     .stTextInput>div>div>input, .stSelectbox>div>div>div, .stNumberInput>div>div>input, .stTextArea>div>div>textarea {
-        border-radius: 16px !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        background-color: rgba(30, 30, 35, 0.6) !important;
-        backdrop-filter: blur(12px);
+        border-radius: 8px !important;
+        border: 1px solid #333333 !important;
+        background-color: #1e1e1e !important;
         padding: 0.6rem 1rem !important;
         font-size: 16px !important; /* บังคับ 16px ป้องกันระบบ iOS ซูมหน้าจออัตโนมัติเวลากดพิมพ์! */
-        box-shadow: inset 0 2px 5px rgba(0,0,0,0.2) !important;
         color: white !important;
-        transition: border-color 0.3s ease;
+        transition: border-color 0.2s ease;
     }
     .stTextInput>div>div>input:focus, .stSelectbox>div>div>div:focus, .stTextArea>div>div>textarea:focus {
-        border-color: #00f2fe !important;
-        box-shadow: 0 0 0 1px rgba(0, 242, 254, 0.5) !important;
+        border-color: #888888 !important;
+        box-shadow: none !important;
     }
 
-    /* Expander Cards (การ์ดหัวข้อแบบลอยขึ้นมา) */
+    /* Expander Cards (การ์ดหัวข้อแบบลอยขึ้นมาแบบ Clean) */
     div[data-testid="stExpander"] {
-        border: 1px solid rgba(255,255,255,0.06) !important;
-        border-radius: 16px !important;
-        background-color: rgba(22, 22, 28, 0.6) !important;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.25) !important;
+        border: 1px solid #2a2a2a !important;
+        border-radius: 12px !important;
+        background-color: #181818 !important;
         margin-bottom: 1rem !important;
         overflow: hidden;
     }
     .streamlit-expanderHeader {
         background-color: transparent !important;
-        font-weight: 600 !important;
+        font-weight: 500 !important;
         font-size: 1.1rem !important;
         padding: 16px 20px !important;
     }
     div[data-testid="stExpanderDetails"] {
         padding: 1.2rem 1rem !important;
-        background-color: rgba(10, 10, 15, 0.3) !important;
-        border-top: 1px solid rgba(255,255,255,0.03);
+        background-color: #121212 !important;
+        border-top: 1px solid #2a2a2a;
     }
 
-    /* ปรับ File Uploader ดีไซน์ล้ำๆ โดดเด่นท่วงท่า */
+    /* ปรับ File Uploader ดีไซน์มินิมอล */
     .stFileUploader>div>div {
-        border-radius: 20px !important;
-        background-color: rgba(40,40,45,0.3) !important;
-        border: 2px dashed rgba(255, 0, 80, 0.5) !important;
+        border-radius: 12px !important;
+        background-color: #1a1a1a !important;
+        border: 1px dashed #555555 !important;
         padding: 2rem !important;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
     }
     .stFileUploader>div>div:hover {
-        border-color: rgba(0, 242, 254, 0.8) !important;
-        background-color: rgba(40,40,45,0.6) !important;
-        transform: scale(1.02);
+        border-color: #888888 !important;
+        background-color: #222222 !important;
     }
 
-    /* กรอบข้อความแจ้งเตือนต่างๆ ให้ออกมาเหมือน Info Cards (Info/Warning/Error/Success) */
+    /* กรอบข้อความแจ้งเตือนต่างๆ */
     div[data-testid="stAlert"] {
-        border-radius: 16px !important;
-        border: 1px solid rgba(255,255,255,0.08) !important;
-        box-shadow: 0 8px 16px rgba(0,0,0,0.15) !important;
-        background-color: rgba(30, 30, 35, 0.5) !important;
-        backdrop-filter: blur(6px);
+        border-radius: 8px !important;
+        border: 1px solid #333333 !important;
+        background-color: #1e1e1e !important;
         padding: 1rem !important;
     }
 
     /* พื้นที่แสดงผลซอร์สโค้ด (st.code) ให้โค้งมนและสวยงาม */
     div[data-testid="stCodeBlock"] {
-        border-radius: 12px !important;
+        border-radius: 8px !important;
         overflow: hidden !important;
-        border: 1px solid rgba(255,255,255,0.1) !important;
+        border: 1px solid #2a2a2a !important;
+        background-color: #1e1e1e !important;
     }
 
     /* 📱 จัดการเฉพาะหน้าจอมือถือ (Mobile Perfect Fit UX) */
@@ -134,24 +132,22 @@ st.markdown("""
             padding-bottom: 4rem !important;
         }
         
-        /* ปรับหัวข้อใหญ่สุดให้เป็น Gradient ไล่สีสวยๆ สไตล์ TikTok */
+        /* ปรับหัวข้อใหญ่สุด เรียบง่าย ไม่มลทิน */
         h1 {
             font-size: 1.8rem !important;
             text-align: left;
-            background: linear-gradient(135deg, #ff0050 0%, #00f2fe 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #ffffff !important;
             margin-bottom: 0.5rem !important;
             line-height: 1.3 !important;
-            font-weight: 700 !important;
+            font-weight: 600 !important;
         }
         
-        /* ปรับระดับหัวรองให้มีเส้นขีดล่างเพิ่มคลาส */
+        /* ปรับระดับหัวรอง */
         h2 {
             font-size: 1.3rem !important;
             margin-top: 1.5rem !important;
             padding-bottom: 0.5rem !important;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid #2a2a2a;
             color: #ececec !important;
         }
         
@@ -168,7 +164,7 @@ st.markdown("""
             line-height: 1.4;
         }
 
-        /* ปุ่มต่างๆ ให้นูนและกดง่ายเต็มความกว้างจอ (Full Width) */
+        /* ปุ่มต่างๆ ให้กดง่ายเต็มความกว้างจอ (Full Width) */
         .stButton > button {
             width: 100% !important;
             padding: 1rem !important;
@@ -181,15 +177,15 @@ st.markdown("""
             font-size: 1.1rem !important;
             padding: 1rem 1.2rem !important;
             margin-right: 0.5rem !important;
-            background-color: rgba(30,30,40,0.6) !important;
-            border-radius: 12px 12px 0 0 !important;
+            background-color: #1e1e1e !important;
+            border-radius: 8px 8px 0 0 !important;
             border-bottom: 2px solid transparent !important;
         }
         button[data-baseweb="tab"][aria-selected="true"] {
-            background-color: rgba(255, 0, 80, 0.15) !important;
-            border-bottom: 2px solid #ff0050 !important;
+            background-color: #2a2a2a !important;
+            border-bottom: 2px solid #e62e5c !important;
             color: white !important;
-            font-weight: 600 !important;
+            font-weight: 500 !important;
         }
     }
 </style>
