@@ -291,7 +291,23 @@ if uploaded_files:
                 )
                 
             with st.expander("🖼️ 2.4 ฉากหลังและบรรยากาศ", expanded=True):
-                char_bg = st.selectbox("🏞️ 2.4 ฉากหลัง (Background)", ["ไม่ระบุ (อิสระตามเนื้อเรื่อง)", "ธรรมชาติป่าไม้ 🌳", "ทะเล/ชายหาด 🌊", "ภูเขา ⛰️", "ในเมือง/ตึกชิคๆ 🏙️"])
+                bg_options = [
+                    "ไม่ระบุ (อิสระตามเนื้อเรื่อง)", 
+                    "ในเมือง/ถนนชิคๆ 🏙️", 
+                    "คาเฟ่/ร้านมินิมอล ☕",
+                    "ตลาด/สตรีทฟู้ด 🥢", 
+                    "ห้างสรรพสินค้า 🛍️", 
+                    "สวนสาธารณะ 🏞️", 
+                    "ริมแม่น้ำ 🚤", 
+                    "ทะเล/ชายหาด 🌊", 
+                    "ภูเขา/ธรรมชาติป่าไม้ 🌳", 
+                    "ในห้อง/มุมสบายนอกบ้าน 🛋️",
+                    "อื่นๆ"
+                ]
+                char_bg = st.selectbox("🏞️ 2.4 ฉากหลัง (Background)", bg_options)
+                
+                if char_bg == "อื่นๆ":
+                    char_bg = st.text_input("พิมพ์ระบุฉากหลังตามต้องการ:")
                 
             with st.expander("🎙️ 2.5 - 2.7 เสียงและซาวด์เอฟเฟกต์", expanded=True):
                 use_sfx = st.radio("🔊 2.5 ใส่ซาวด์เอฟเฟกต์ (Sound Effects) ในสคริปต์?", [
@@ -421,12 +437,12 @@ if uploaded_files:
    - **สำคัญมาก (การตั้งชื่อไฟล์):** บังคับให้คุณขึ้นต้นประโยคแรกของ `image_prompt` ทุกซีนด้วยคำว่า "Scene_1_", "Scene_2_", "Scene_3_" ... ตามลำดับซีนเสมอ (เช่น "Scene_1_ Vertical 9:16 aspect ratio...") เพื่อให้เวลาที่ฉันกดดาวน์โหลดรูปภาพที่คุณวาด ชื่อไฟล์จะได้ไม่ซ้ำกันและง่ายต่อการอัปโหลด
    - บังคับให้ใส่: "Vertical 9:16 aspect ratio, NO text overlays, NO typography, ONLY one single distinct scene, NO 4-panel grid, NO split screen"
    - **กฎการแยกภาพ (No Grid/Collage):** ห้ามให้ AI เจนภาพ 4 ซีนรวมอยู่ในรูปเดียว (กากบาท/ตาราง 4 ช่อง) อย่างเด็ดขาด! บังคับเขียนสั่งท้าย prompt ว่า "Single full frame, absolutely NO multi-panel collage"
-   - **กฎการล็อกเป้าตัวละครและสถานที่ (CRITICAL: 100% UNIFIED SCENE & CHARACTER):** คุณต้องสร้างข้อความอธิบายตัวละคร ชุด และสถานที่ ที่ละเอียดมาก (MASTER_APPEARANCE_AND_ENVIRONMENT_PROMPT) ขึ้นมา 1 ชุดตายตัว และ **"คุณต้อง COPY และ PASTE ข้อความชุดนี้ใส่เป็นคำขึ้นต้นใน `image_prompt` ของทุกๆ ซีนแบบห้ามตัวอักษรเพี้ยนแม้แต่คำเดียวเด็ดขาด"** (ห้ามสลับสถานที่ ห้ามสลับชุด ห้ามเปลี่ยนทรงผม เรื่องราวทั้งหมดต้องเกิดใน 'สถานที่เดียวกัน' และ 'เวลาต่อเนื่องกัน' ทั้งคลิป)
-   - **การขยับท่าทาง (Action):** เมื่อคุณวางข้อความ Master Prompt แล้ว ตอนท้ายของแต่ละซีนค่อยเขียนเปลี่ยนเฉพาะ "ท่าทางการโพส การกระทำ และ มุมกล้อง (Camera Angle/Action/Pose)" ให้ร้อยเรียงกันเป็นเรื่องราวเดียวตั้งแต่ซีนแรกจนซีนสุดท้ายเสมือนการถ่ายวิดีโอต่อเนื่อง (Single Location)
-   - **กฎความสมส่วนหน้าตาและสินค้า:** ให้สั่งย้ำคำว่า "Realistic anatomical proportions, product size is naturally scaled, EXACTLY the same person identity and exact same environment across all scenes" เพื่อให้ขนาดสินค้าไม่ผิดเพี้ยน
+   - **กฎการล็อกเป้า 100% (CRITICAL UNIFIED CORE_PROMPT):** คุณต้องรวบรวมรายละเอียดทั้งหมด ได้แก่ 1) หน้าตาและสรีระของตัวละคร (สีผม ทรงผม ชุดที่ใส่) 2) ลักษณะของรูปภาพสินค้า (อักษร ลายพิมพ์ สี) แบบละเอียดโคตรๆ และ 3) ฉากหลังที่เจาะจงมาก (เช่น A specific modern kitchen) 
+   - นำข้อมูลทั้ง 3 ข้อด้านบนมาแต่งรวมกันเป็น 1 ย่อหน้า เรียกว่า `[CORE_PROMPT]` และ **คุณมีหน้าที่ต้อง COPY และ PASTE `[CORE_PROMPT]` นี้ นำหน้า `image_prompt` ในทุกๆ ซีนย่อย ห้ามตกหล่นแม้แต่ตัวอักษรเดียว!**
+   - ส่วนที่เปลี่ยนได้ในแต่ละซีน คือแค่ "ท่าทางโพส (Pose)" และ "มุมกล้อง (Camera Angle)" ต่อท้าย `[CORE_PROMPT]` เท่านั้น! เพื่อบังคับให้ AI สร้างภาพ นางแบบเดิม ฉากเดิม สินค้าเดิม ตลอดทั้งคลิป!
+   - **กฎเหล็กเพื่อความชัด (ห้ามเบลอฉากหลังเด็ดขาด):** บังคับให้ทุกประโยค `image_prompt` จบด้วยคำสั่งนี้เสมอ: "Taken with an ordinary cheap smartphone camera, amateur unedited snapshot, zero portrait mode. The background environment is 100% crystal clear and fully visible in sharp focus, deep depth of field, NO bokeh, NO background blur at all, perfectly sharp scenery background, correct anatomical hands and limbs."
 {image_style_instruction}
-   - **กฎการเก็บรายละเอียดด้านหลังสินค้า:** เนื่องจาก AI มักจะวาดด้านหลังเสื้อผ้า (เช่น เสื้อยืด) ออกมาเพี้ยน หากมีการแพนกล้องให้เห็นด้านหลัง ให้คุณวาดลวดลายด้านหลัง **"ให้เหมือนกับด้านหน้าเป๊ะๆ"** (Mirror the exact front design/pattern to the back) ห้ามมโนสร้างลวดลายใหม่ขึ้นมาเอง หรือถ้าหลีกเลี่ยงได้ให้เน้นถ่ายแต่ด้านหน้า (Front view only) เป็นหลัก
-   - บรรยายแสงเงา บรรยากาศ มุมกล้อง (Lighting, Mood, Camera angle) ให้สวยงามสมจริง ห้ามสั่งให้วาดป้ายราคา/ข้อความ
+   - บรรยายแสงเงา บรรยากาศ มุมกล้อง ให้เป็นแบบ "แสงธรรมชาติทั่วไป (Natural daily lighting)" ห้ามจัดแสงสวยหรูแบบสตูดิโอเด็ดขาด และห้ามสั่งให้วาดป้ายราคาหรือข้อความทับลงไปในภาพเด็ดขาด
 6. เขียน video_prompt เป็นภาษาอังกฤษ สำหรับ **เจนวนิเมชัน+เสียง บน Google Labs Flow**
 {video_style_instruction}
    - **กฎการพาแพนกล้อง (มุมด้านหลัง):** หากไม่มีความจำเป็น ให้หลีกเลี่ยงการเขียน Prompt สั่งแพนกล้องไปข้างหลัง ให้เน้นขยับกล้องเฉพาะด้านหน้า (Front view only) แต่ถ้าจำเป็นต้องเห็นด้านหลัง บังคับเขียนคำสั่งเพิ่มว่า "Back design is exactly identical to the front pattern" เพื่อไม่ให้ AI มโนลวดลายประหลาดๆ ขึ้นมาเอง
@@ -486,25 +502,55 @@ if uploaded_files:
                 os.makedirs("assets/video", exist_ok=True)
                 os.makedirs("assets/audio", exist_ok=True)
 
-                # สร้างคำสั่ง Image Prompt แบบรวมทุกซีน
+                # สร้างคำสั่ง Image Prompt แบบ Task-by-Task โดยส่ง JSON ให้ AI
                 st.markdown("---")
-                with st.expander("✨ เจนภาพทุกซีนพร้อมกันในคำสั่งเดียว (Combined Image Prompt)", expanded=False):
-                    st.write("ก๊อปปี้คำสั่งด้านล่างไปวางใน AI Image Generator (เช่น Gemini, ChatGPT) เพื่อให้วาดรูปให้ครบทุกซีนในครั้งเดียว")
-                    st.warning("⚠️ **ปัญหาที่พบบ่อย (AI ขี้เกียจ):** หาก Gemini วาดให้แค่รูปเดียวแล้วหยุด ให้พิมพ์ด่า AI ไปว่า **'ยังวาดไม่ครบ วาดซีนที่เหลือต่อให้จบเดี๋ยวนี้'** หรือใช้วิธีก๊อปปี้ไปวางทีละรูปครับ")
+                with st.expander("✨ เจนภาพทุกซีนแบบทีละ Task (ส่ง JSON ให้ AI รอรับคำสั่ง)", expanded=False):
+                    st.write("ก๊อปปี้คำสั่งด้านล่างไปวางใน AI Image Generator (เช่น Gemini, ChatGPT) เพื่อเริ่มระบบวาดรูปทีละ Task ป้องกันปัญหา AI ขี้เกียจหรือวาดไม่ครบ")
+                    
+                    # เตรียม JSON สำหรับแต่ละ Task
+                    json_prompts = []
+                    for scene in video_plan.scenes:
+                        json_prompts.append({
+                            "Task": f"Task {scene.scene_number}",
+                            "Scene": scene.scene_number,
+                            "Image_Prompt": scene.image_prompt
+                        })
+                    task_json_str = json.dumps(json_prompts, indent=2, ensure_ascii=False)
                     
                     # รูปแบบ Text Prompt
-                    combined_text = f"🚨 คำสั่งระดับสูงสุด: คุณต้องสร้างรูปภาพแยกกันทั้งหมด {len(video_plan.scenes)} รูป ตาม Prompt ด้านล่างนี้ให้ครบทุก Scene ในการตอบกลับครั้งเดียว! ห้ามวาดรวมกัน และห้ามข้าม Scene ใด Scene หนึ่งไปเด็ดขาด! (CRITICAL MANDATORY: Generate {len(video_plan.scenes)} INDIVIDUAL images consecutively. DO NOT stop until you generate all {len(video_plan.scenes)} images.)\n\n"
-                    for scene in video_plan.scenes:
-                        combined_text += f"--- [รูปภาพที่ {scene.scene_number}] ---\n{scene.image_prompt}\n\n"
-                    
-                    # รูปแบบ JSON กรณีใช้กับ Tool อื่นๆ
-                    combined_json = json.dumps([{"scene": s.scene_number, "image_prompt": s.image_prompt} for s in video_plan.scenes], indent=2, ensure_ascii=False)
+                    combined_text = f"""🚨 คำสั่งระดับสูงสุดในการสร้างรูปภาพ (อ่านกฎให้จบก่อนเริ่มทำ): 
+ฉันมีข้อมูล JSON ที่บรรจุคำสั่ง (Prompt) สำหรับสร้างรูปภาพทั้งหมด {len(video_plan.scenes)} ซีน 
+กฎระบบการทำงานแบบ Step-by-Step มอบหมายงานเป็น Task มีดังนี้:
+1. ให้คุณอ่าน Prompt จากก้อน JSON ด้านล่าง และวาดรูปเริ่มจาก "Task 1 (Scene 1)" เท่านั้น! (ห้ามวาดรูปอื่นมาก่อน และ ห้ามวาดรวมกันภาพเดียว 4 ช่อง)
+2. เมื่อคุณวาดรูปของ Task ปัจจุบันเสร็จ ให้คุณตอบกลับท้ายรูปภาพด้วยข้อความนี้: *"✅ วาดรูป Task [เลขปัจจุบัน] เสร็จแล้ว พิมพ์ 'Task [เลขถัดไป]' เพื่อไปต่อได้เลย"* แล้ว **หยุดชะงักรอคำสั่ง** (ไม่ต้องวาดต่อจนกว่าฉันจะสั่ง)
+3. เมื่อฉันพิมพ์คำสั่ง "Task 2", "Task 3" ...ไปเรื่อยๆ ให้คุณไปดึง Prompt ของ Scene ที่ตรงกับเลข Task ใน JSON มาวาดต่อไปจนครบ
+
+นี่คือข้อมูล JSON บรรจุ Prompt ทั้งหมด:
+```json
+{task_json_str}
+```
+
+เริ่มทำงานคำสั่งแรกเลย: **Task 1** (อ่าน JSON ด้านบนแล้ววาดรูป Scene 1 ออกมา)
+"""
                     
                     t1, t2 = st.tabs(["📝 แบบข้อความ (เอาไปวางใน Gemini/ChatGPT)", "⚙️ แบบรหัส JSON (เอาไปใช้กับ Automation Tools)"])
                     with t1:
                         st.code(combined_text, language="text")
                     with t2:
-                        st.code(combined_json, language="json")
+                        st.code(task_json_str, language="json")
+                        
+                    # เพิ่มส่วนก๊อปปี้ด่วนสำหรับ Task ต่อไป
+                    st.markdown("---")
+                    st.write("📋 **[ก๊อปปี้ด่วน] คำสั่งสำหรับไปต่อ Task ถัดไป (คลิกไอคอน Copy มุมขวาด้านในของกล่องได้เลย):**")
+                    st.info("💡 สามารถกดก๊อปปี้ Task ถัดไปเตรียมไว้เพื่อไปปาใส่แชทต่อได้เลยครับ ไม่ต้องพิมพ์เอง")
+                    
+                    num_tasks = len(video_plan.scenes)
+                    if num_tasks > 1:
+                        cols = st.columns(min(4, num_tasks - 1))
+                        for i in range(2, num_tasks + 1):
+                            with cols[(i-2) % len(cols)]:
+                                st.markdown(f"**ซีนที่ {i}:**")
+                                st.code(f"Task {i}", language="text")
                 
 
                 # ใช้ระบบ Tabs เป็นมิตรกับมือถือและลดการไถจอ
