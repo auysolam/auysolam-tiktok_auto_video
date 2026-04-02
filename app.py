@@ -212,6 +212,30 @@ with st.sidebar:
     st.markdown("**⚙️ โหมดการทำงาน:** 👨‍💻 แมนนวล (ปรุง Prompt ให้ไปก๊อปวาง)")
     st.success("🟢 โหมดแมนนวลทำงานอิสระ 100%\\n(อัปโหลดรูป ฝาก Prompt ให้ AI และนำผลลัพธ์ที่ได้มาก๊อปวางทีละขั้นตอน)")
 
+# ส่วนทางลัด: วาง JSON โหลดหน้าผลลัพธ์ทันที
+st.markdown("---")
+st.subheader("📥 ข้ามขั้นตอน/ทำต่อ (Fast Track): วางผลลัพธ์ JSON ลงที่นี่")
+st.info("💡 หากคุณนำ Prompt ไปเจนใน Gemini และได้โค้ด JSON มาแล้ว หรือหน้าเว็บถูกรีเฟรช คุณสามารถนำโค้ด JSON มาวางตรงนี้เพื่อทำงานต่อได้เลย ไม่ต้องอัปโหลดรูปใหม่ครับ")
+
+default_json = st.session_state.get('demo_pasted_json', '')
+pasted_json = st.text_area("วาง 'โค้ด JSON' ทั้งหมดลงในช่องนี้:", value=default_json, height=150)
+if st.button("✅ ประมวลผลตารางสคริปต์ (Render Storyboard)", use_container_width=True):
+    if pasted_json.strip():
+        try:
+            # ล้างโค้ด Markdown block ออกเผื่อผู้ใช้ก๊อปมาติด ```json 
+            cleaned_json = pasted_json.replace("```json", "").replace("```", "").strip()
+            video_plan = VideoPlan.model_validate_json(cleaned_json)
+            st.session_state.video_plan_json = cleaned_json
+            st.session_state.generated_images = {}
+            st.success(f"✅ ประมวลผลโค้ดแยกช็อตสำเร็จ! (สินค้า: {video_plan.product_name})")
+        except Exception as e:
+            st.error(f"❌ รูปแบบ JSON ไม่ถูกต้อง กรุณาเช็คว่าก๊อปปี้โค้ดมาครบทุกบรรทัดตั้งแต่ปีกกาเปิดยันปิดหรือไม่ (รายละเอียด: {e})")
+    else:
+        st.warning("⚠️ กรุณาวางโค้ด JSON ก่อนกดปุ่มครับ")
+
+st.markdown("---")
+st.subheader("⚙️ หรือเริ่มต้นใหม่: สร้างคำสั่ง Prompt ด้วยรูปภาพสินค้า")
+
 # ส่วนอัปโหลดภาพสินค้า
 uploaded_files = st.file_uploader("📸 อัปโหลดรูปภาพสินค้าของคุณทั้งหมด (รับได้ 1-4 ภาพ) (JPG, PNG, WEBP)", type=['jpg', 'jpeg', 'png', 'webp'], accept_multiple_files=True)
 
@@ -461,60 +485,46 @@ if uploaded_files:
                     
                     st.warning("💡 **คำแนะนำเพิ่มเติม:** เนื่องจากบางบัญชีของ Gemini ไม่รองรับการวาดรูปภาพ หรือติดปัญหาด้าน Policy หลังจากที่คุณได้โค้ด JSON ด้านล่างแล้ว **ให้คุณนำ `image_prompt` ของแต่ละซีน ไปเจนรูปในโปรแกรมฟรี เช่น Google ImageFX, Microsoft Designer หรือ Midjourney แทนครับ**")
                 
-            st.markdown("---")
-            st.subheader("📥 4.5 วางผลลัพธ์จาก Gemini ลงที่นี่")
-            default_json = st.session_state.get('demo_pasted_json', '')
-            pasted_json = st.text_area("เมื่อหน้าเว็บ Gemini พิมพ์บทให้เสร็จ ให้ก๊อปปี้ 'โค้ด JSON' ทั้งหมด นำมาประเคนไว้ในช่องนี้ครับ:", value=default_json, height=150)
-            if st.button("✅ ประมวลผลตารางสคริปต์ (Render Storyboard)", use_container_width=True):
-                if pasted_json.strip():
-                    try:
-                        # ล้างโค้ด Markdown block ออกเผื่อผู้ใช้ก๊อปมาติด ```json 
-                        cleaned_json = pasted_json.replace("```json", "").replace("```", "").strip()
-                        video_plan = VideoPlan.model_validate_json(cleaned_json)
-                        st.session_state.video_plan_json = cleaned_json
-                        st.session_state.generated_images = {}
-                        st.success(f"✅ ประมวลผลโค้ดแยกช็อตสำเร็จ! (สินค้า: {video_plan.product_name})")
-                    except Exception as e:
-                        st.error(f"❌ รูปแบบ JSON ไม่ถูกต้อง กรุณาเช็คว่าก๊อปปี้โค้ดมาครบทุกบรรทัดตั้งแต่ปีกกาเปิดยันปิดหรือไม่ (รายละเอียด: {e})")
-                else:
-                    st.warning("⚠️ กรุณาวางโค้ด JSON ก่อนกดปุ่มครับ")
 
-        # ส่วนที่ดึงตารางและขั้นตอนหลังจากโหลด JSON ยัดเข้า session_state เรียบร้อย
-        if st.session_state.video_plan_json:
-            try:
-                video_plan = VideoPlan.model_validate_json(st.session_state.video_plan_json)
-                
-                # โชว์แท็บจัดกลุ่มตามซีน
-                st.markdown("---")
-                st.subheader("📋 5. แผนการทำวิดีโอรายฉาก (Storyboard & Prompts)")
-                st.info("แตะขวา/ซ้าย ที่แท็บเพื่อดูรายละเอียดและอัปโหลดวิดีโอทีละซีน👇")
-                st.markdown("*(ก๊อปปี้ Image Prompt แยกไปเจนภาพในเว็บด้านล่างนี้ได้เลย)*")
-                col_btn1, col_btn2 = st.columns(2)
-                with col_btn1:
-                    st.link_button("🖼️ สร้างรูปภาพด้วย Gemini", "https://gemini.google.com/app", use_container_width=True)
-                with col_btn2:
-                    st.link_button("🎥 สร้างฟุตเทจด้วย Labs Flow", "https://labs.google/fx/tools/flow", use_container_width=True)
 
-                os.makedirs("assets/video", exist_ok=True)
-                os.makedirs("assets/audio", exist_ok=True)
+# ----------------------------------------------------------------------------------
+# ส่วนแสดงผล Storyboard และข้อมูลโพสต์ (จะแสดงเสมอหากมี video_plan_json ใน session_state)
+# ----------------------------------------------------------------------------------
+if st.session_state.video_plan_json:
+    try:
+        video_plan = VideoPlan.model_validate_json(st.session_state.video_plan_json)
+        
+        # โชว์แท็บจัดกลุ่มตามซีน
+        st.markdown("---")
+        st.subheader("📋 แผนการทำวิดีโอรายฉาก (Storyboard & Prompts)")
+        st.info("แตะขวา/ซ้าย ที่แท็บเพื่อดูรายละเอียดและอัปโหลดวิดีโอทีละซีน👇")
+        st.markdown("*(ก๊อปปี้ Image Prompt แยกไปเจนภาพในเว็บด้านล่างนี้ได้เลย)*")
+        col_btn1, col_btn2 = st.columns(2)
+        with col_btn1:
+            st.link_button("🖼️ สร้างรูปภาพด้วย Gemini", "https://gemini.google.com/app", use_container_width=True)
+        with col_btn2:
+            st.link_button("🎥 สร้างฟุตเทจด้วย Labs Flow", "https://labs.google/fx/tools/flow", use_container_width=True)
 
-                # สร้างคำสั่ง Image Prompt แบบ Task-by-Task โดยส่ง JSON ให้ AI
-                st.markdown("---")
-                with st.expander("✨ เจนภาพทุกซีนแบบทีละ Task (ส่ง JSON ให้ AI รอรับคำสั่ง)", expanded=False):
-                    st.write("ก๊อปปี้คำสั่งด้านล่างไปวางใน AI Image Generator (เช่น Gemini, ChatGPT) เพื่อเริ่มระบบวาดรูปทีละ Task ป้องกันปัญหา AI ขี้เกียจหรือวาดไม่ครบ")
-                    
-                    # เตรียม JSON สำหรับแต่ละ Task
-                    json_prompts = []
-                    for scene in video_plan.scenes:
-                        json_prompts.append({
-                            "Task": f"Task {scene.scene_number}",
-                            "Scene": scene.scene_number,
-                            "Image_Prompt": scene.image_prompt
-                        })
-                    task_json_str = json.dumps(json_prompts, indent=2, ensure_ascii=False)
-                    
-                    # รูปแบบ Text Prompt
-                    combined_text = f"""🚨 คำสั่งระดับสูงสุดในการสร้างรูปภาพ (อ่านกฎให้จบก่อนเริ่มทำ): 
+        os.makedirs("assets/video", exist_ok=True)
+        os.makedirs("assets/audio", exist_ok=True)
+
+        # สร้างคำสั่ง Image Prompt แบบ Task-by-Task โดยส่ง JSON ให้ AI
+        st.markdown("---")
+        with st.expander("✨ เจนภาพทุกซีนแบบทีละ Task (ส่ง JSON ให้ AI รอรับคำสั่ง)", expanded=False):
+            st.write("ก๊อปปี้คำสั่งด้านล่างไปวางใน AI Image Generator (เช่น Gemini, ChatGPT) เพื่อเริ่มระบบวาดรูปทีละ Task ป้องกันปัญหา AI ขี้เกียจหรือวาดไม่ครบ")
+            
+            # เตรียม JSON สำหรับแต่ละ Task
+            json_prompts = []
+            for scene in video_plan.scenes:
+                json_prompts.append({
+                    "Task": f"Task {scene.scene_number}",
+                    "Scene": scene.scene_number,
+                    "Image_Prompt": scene.image_prompt
+                })
+            task_json_str = json.dumps(json_prompts, indent=2, ensure_ascii=False)
+            
+            # รูปแบบ Text Prompt
+            combined_text = f"""🚨 คำสั่งระดับสูงสุดในการสร้างรูปภาพ (อ่านกฎให้จบก่อนเริ่มทำ): 
 ฉันมีข้อมูล JSON ที่บรรจุคำสั่ง (Prompt) สำหรับสร้างรูปภาพทั้งหมด {len(video_plan.scenes)} ซีน 
 กฎระบบการทำงานแบบ Step-by-Step มอบหมายงานเป็น Task มีดังนี้:
 1. ให้คุณอ่าน Prompt จากก้อน JSON ด้านล่าง และวาดรูปเริ่มจาก "Task 1 (Scene 1)" เท่านั้น! (ห้ามวาดรูปอื่นมาก่อน และ ห้ามวาดรวมกันภาพเดียว 4 ช่อง)
@@ -528,76 +538,76 @@ if uploaded_files:
 
 เริ่มทำงานคำสั่งแรกเลย: **Task 1** (อ่าน JSON ด้านบนแล้ววาดรูป Scene 1 ออกมา)
 """
-                    
-                    t1, t2 = st.tabs(["📝 แบบข้อความ (เอาไปวางใน Gemini/ChatGPT)", "⚙️ แบบรหัส JSON (เอาไปใช้กับ Automation Tools)"])
-                    with t1:
-                        st.code(combined_text, language="text")
-                    with t2:
-                        st.code(task_json_str, language="json")
-                        
-                    # เพิ่มส่วนก๊อปปี้ด่วนสำหรับ Task ต่อไป
-                    st.markdown("---")
-                    st.write("📋 **[ก๊อปปี้ด่วน] คำสั่งสำหรับไปต่อ Task ถัดไป (คลิกไอคอน Copy มุมขวาด้านในของกล่องได้เลย):**")
-                    st.info("💡 สามารถกดก๊อปปี้ Task ถัดไปเตรียมไว้เพื่อไปปาใส่แชทต่อได้เลยครับ ไม่ต้องพิมพ์เอง")
-                    
-                    num_tasks = len(video_plan.scenes)
-                    if num_tasks > 1:
-                        cols = st.columns(min(4, num_tasks - 1))
-                        for i in range(2, num_tasks + 1):
-                            with cols[(i-2) % len(cols)]:
-                                st.markdown(f"**ซีนที่ {i}:**")
-                                st.code(f"Task {i}", language="text")
+            
+            t1, t2 = st.tabs(["📝 แบบข้อความ (เอาไปวางใน Gemini/ChatGPT)", "⚙️ แบบรหัส JSON (เอาไปใช้กับ Automation Tools)"])
+            with t1:
+                st.code(combined_text, language="text")
+            with t2:
+                st.code(task_json_str, language="json")
                 
-
-                # ใช้ระบบ Tabs เป็นมิตรกับมือถือและลดการไถจอ
-                scene_tabs = st.tabs([f"🎬 ซีน {scene.scene_number}" for scene in video_plan.scenes])
-                
-                for i, scene in enumerate(video_plan.scenes):
-                    with scene_tabs[i]:
-                        st.markdown(f"**⏱️ เวลา:** {scene.timecode_start} - {scene.timecode_end}")
-                        st.markdown(f"**🗣️ บทพากย์/เสียง:** {scene.script}")
-                        
-                        st.markdown("---")
-                        st.write("🖼️ **1. นำพรอมต์นี้ไปสร้างรูป (Image Prompt):**")
-                        st.code(scene.image_prompt, language="text")
-                        
-                        st.markdown("---")
-                        st.write("🎥 **2. นำรูปภาพและพรอมต์นี้ไปทำภาพเคลื่อนไหว:**")
-                        st.code(f"{scene.video_prompt}\\n(Voiceover: {scene.script})", language="text")
-                        
-            except Exception as e:
-                st.error(f"ข้อผิดพลาดระหว่างแสดงผลสคริปต์: {e}")
-                
-        st.markdown("---")
-        st.subheader("📝 6. ข้อมูลสำหรับโพสต์ TikTok (Caption & Hashtags)")
-        st.write("ระบบจะดึงข้อมูลแคปชั่นและแฮชแท็กมาให้โดยอัตโนมัติ จากโค้ด JSON ที่คุณวางในขั้นตอนที่ 4.5")
+            # เพิ่มส่วนก๊อปปี้ด่วนสำหรับ Task ต่อไป
+            st.markdown("---")
+            st.write("📋 **[ก๊อปปี้ด่วน] คำสั่งสำหรับไปต่อ Task ถัดไป (คลิกไอคอน Copy มุมขวาด้านในของกล่องได้เลย):**")
+            st.info("💡 สามารถกดก๊อปปี้ Task ถัดไปเตรียมไว้เพื่อไปปาใส่แชทต่อได้เลยครับ ไม่ต้องพิมพ์เอง")
+            
+            num_tasks = len(video_plan.scenes)
+            if num_tasks > 1:
+                cols = st.columns(min(4, num_tasks - 1))
+                for i in range(2, num_tasks + 1):
+                    with cols[(i-2) % len(cols)]:
+                        st.markdown(f"**ซีนที่ {i}:**")
+                        st.code(f"Task {i}", language="text")
         
-        if st.session_state.video_plan_json:
-            try:
-                import json
-                video_plan_data = json.loads(st.session_state.video_plan_json)
-                post_data = video_plan_data.get('tiktok_post_data')
+
+        # ใช้ระบบ Tabs เป็นมิตรกับมือถือและลดการไถจอ
+        scene_tabs = st.tabs([f"🎬 ซีน {scene.scene_number}" for scene in video_plan.scenes])
+        
+        for i, scene in enumerate(video_plan.scenes):
+            with scene_tabs[i]:
+                st.markdown(f"**⏱️ เวลา:** {scene.timecode_start} - {scene.timecode_end}")
+                st.markdown(f"**🗣️ บทพากย์/เสียง:** {scene.script}")
                 
-                if post_data:
-                    st.info("**📌 รายละเอียดสินค้า**")
-                    st.code(post_data.get('product_details', ''), language="text")
-                    
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        st.success("**💬 ข้อความพาดหัวคลิป (Overlay Text)**")
-                        st.code(post_data.get('overlay_text', ''), language="text")
-                        
-                        st.warning("**🛒 ชื่อปุ่มตะกร้า/ลิงก์**")
-                        st.code(post_data.get('link_title', ''), language="text")
-                    with col2:
-                        st.info("**📝 แคปชั่นโพสต์ขาย (Caption)**")
-                        st.code(post_data.get('post_caption', ''), language="text")
-                        
-                        st.write("**#️⃣ แฮชแท็ก**")
-                        st.code(post_data.get('hashtags', ''), language="text")
-                else:
-                    st.warning("⚠️ ไม่พบข้อมูลแคปชั่นและแฮชแท็กในโค้ด JSON กรุณากลับไปเช็ค Gemini หรือลองกดสร้างโค้ดใหม่อีกครั้งครับ")
-            except Exception as e:
-                st.error(f"❌ เกิดข้อผิดพลาดในการวิเคราะห์ข้อมูลแคปชั่น: {e}")
+                st.markdown("---")
+                st.write("🖼️ **1. นำพรอมต์นี้ไปสร้างรูป (Image Prompt):**")
+                st.code(scene.image_prompt, language="text")
+                
+                st.markdown("---")
+                st.write("🎥 **2. นำรูปภาพและพรอมต์นี้ไปทำภาพเคลื่อนไหว:**")
+                st.code(f"{scene.video_prompt}\\n(Voiceover: {scene.script})", language="text")
+                
+    except Exception as e:
+        st.error(f"ข้อผิดพลาดระหว่างแสดงผลสคริปต์: {e}")
+        
+st.markdown("---")
+st.subheader("📝 ข้อมูลสำหรับโพสต์ TikTok (Caption & Hashtags)")
+st.write("ระบบจะดึงข้อมูลแคปชั่นและแฮชแท็กมาให้โดยอัตโนมัติ จากโค้ด JSON ที่คุณวาง")
+
+if st.session_state.video_plan_json:
+    try:
+        import json
+        video_plan_data = json.loads(st.session_state.video_plan_json)
+        post_data = video_plan_data.get('tiktok_post_data')
+        
+        if post_data:
+            st.info("**📌 รายละเอียดสินค้า**")
+            st.code(post_data.get('product_details', ''), language="text")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                st.success("**💬 ข้อความพาดหัวคลิป (Overlay Text)**")
+                st.code(post_data.get('overlay_text', ''), language="text")
+                
+                st.warning("**🛒 ชื่อปุ่มตะกร้า/ลิงก์**")
+                st.code(post_data.get('link_title', ''), language="text")
+            with col2:
+                st.info("**📝 แคปชั่นโพสต์ขาย (Caption)**")
+                st.code(post_data.get('post_caption', ''), language="text")
+                
+                st.write("**#️⃣ แฮชแท็ก**")
+                st.code(post_data.get('hashtags', ''), language="text")
         else:
-            st.info("👈 เมื่อคุณนำโค้ด JSON วางในข้อ 4.5 เสร็จแล้ว ข้อมูลโพสต์ทั้งหมดจะเด้งขึ้นมาตรงนี้ทันทีครับ!")
+            st.warning("⚠️ ไม่พบข้อมูลแคปชั่นและแฮชแท็กในโค้ด JSON กรุณากลับไปเช็ค Gemini หรือลองกดสร้างโค้ดใหม่อีกครั้งครับ")
+    except Exception as e:
+        st.error(f"❌ เกิดข้อผิดพลาดในการวิเคราะห์ข้อมูลแคปชั่น: {e}")
+else:
+    st.info("👈 เมื่อคุณนำโค้ด JSON วางในช่องรับข้อมูลด้านบนเสร็จแล้ว ข้อมูลโพสต์ทั้งหมดจะเด้งขึ้นมาตรงนี้ทันทีครับ!")
