@@ -3,6 +3,7 @@ import os
 import asyncio
 from PIL import Image
 import json
+import google.generativeai as genai
 
 # นำเข้าฟังก์ชันจากระบบที่เราเขียนไว้
 from core.schema import VideoPlan
@@ -209,32 +210,18 @@ os.makedirs("output", exist_ok=True)
 # ส่วนตั้งค่าโหมดและ API Key 
 with st.sidebar:
     st.header("⚙️ การตั้งค่าระบบ")
-    st.markdown("**⚙️ โหมดการทำงาน:** 👨‍💻 แมนนวล (ปรุง Prompt ให้ไปก๊อปวาง)")
-    st.success("🟢 โหมดแมนนวลทำงานอิสระ 100%\\n(อัปโหลดรูป ฝาก Prompt ให้ AI และนำผลลัพธ์ที่ได้มาก๊อปวางทีละขั้นตอน)")
-
-# ส่วนทางลัด: วาง JSON โหลดหน้าผลลัพธ์ทันที
-st.markdown("---")
-st.subheader("📥 ข้ามขั้นตอน/ทำต่อ (Fast Track): วางผลลัพธ์ JSON ลงที่นี่")
-st.info("💡 หากคุณนำ Prompt ไปเจนใน Gemini และได้โค้ด JSON มาแล้ว หรือหน้าเว็บถูกรีเฟรช คุณสามารถนำโค้ด JSON มาวางตรงนี้เพื่อทำงานต่อได้เลย ไม่ต้องอัปโหลดรูปใหม่ครับ")
-
-default_json = st.session_state.get('demo_pasted_json', '')
-pasted_json = st.text_area("วาง 'โค้ด JSON' ทั้งหมดลงในช่องนี้:", value=default_json, height=150)
-if st.button("✅ ประมวลผลตารางสคริปต์ (Render Storyboard)", use_container_width=True):
-    if pasted_json.strip():
-        try:
-            # ล้างโค้ด Markdown block ออกเผื่อผู้ใช้ก๊อปมาติด ```json 
-            cleaned_json = pasted_json.replace("```json", "").replace("```", "").strip()
-            video_plan = VideoPlan.model_validate_json(cleaned_json)
-            st.session_state.video_plan_json = cleaned_json
-            st.session_state.generated_images = {}
-            st.success(f"✅ ประมวลผลโค้ดแยกช็อตสำเร็จ! (สินค้า: {video_plan.product_name})")
-        except Exception as e:
-            st.error(f"❌ รูปแบบ JSON ไม่ถูกต้อง กรุณาเช็คว่าก๊อปปี้โค้ดมาครบทุกบรรทัดตั้งแต่ปีกกาเปิดยันปิดหรือไม่ (รายละเอียด: {e})")
+    st.markdown("**⚙️ โหมดการทำงาน:** 🤖 ออโต้ (ใช้ API Key)")
+    
+    # รับ API Key
+    api_key = st.text_input("🔑 ใส่ Gemini API Key", type="password")
+    if api_key:
+        genai.configure(api_key=api_key)
+        st.success("✅ เชื่อมต่อ API Key แล้ว")
     else:
-        st.warning("⚠️ กรุณาวางโค้ด JSON ก่อนกดปุ่มครับ")
-
-st.markdown("---")
-st.subheader("⚙️ หรือเริ่มต้นใหม่: สร้างคำสั่ง Prompt ด้วยรูปภาพสินค้า")
+        st.warning("⚠️ กรุณาใส่ API Key ก่อนเริ่มใช้งาน")
+    
+    st.markdown("---")
+st.subheader("📸 1. เริ่มต้นใหม่: อัปโหลดรูปภาพสินค้า")
 
 # ส่วนอัปโหลดภาพสินค้า
 uploaded_files = st.file_uploader("📸 อัปโหลดรูปภาพสินค้าของคุณทั้งหมด (รับได้ 1-4 ภาพ) (JPG, PNG, WEBP)", type=['jpg', 'jpeg', 'png', 'webp'], accept_multiple_files=True)
@@ -260,9 +247,10 @@ if uploaded_files:
             
         st.markdown("---")
         
-        # ถือว่ามีข้อมูลเริ่มต้นเลยเพื่อปลดล็อคขั้นตอนถัดไปในโหมดแมนนวล
+        st.markdown("---")
+        
         if not st.session_state.product_info:
-            st.session_state.product_info = "(ระบบจะให้คุณส่งรูปให้ Gemini วิเคราะห์สินค้าช่วยสำหรับโหมดแมนนวล)"
+            st.session_state.product_info = "(ระบบจะให้คุณส่งรูปให้ Gemini วิเคราะห์สินค้าช่วย)"
 
         # แสดงส่วนตั้งค่าวิดีโอทันทีที่อัปโหลด (ถ้าเป็นแมนนวล) หรือเมื่อวิเคราะห์เสร็จ (ถ้าเป็นออโต้)
         if st.session_state.product_info:
@@ -288,6 +276,8 @@ if uploaded_files:
 
                 if fashion_mode:
                     fashion_item_type = st.selectbox("👗 2.1.2 ประเภทสินค้าแฟชั่น", ["เสื้อ (Tops)", "กางเกง/กระโปรง (Bottoms)", "ชุดเดรส/ชุดเซท (Dress/Sets)", "กระเป๋า (Bags)", "รองเท้า (Shoes)", "หมวก/เครื่องประดับ (Accessories)", "อื่นๆ"])
+                    if fashion_item_type == "อื่นๆ":
+                        fashion_item_type = st.text_input("ระบุประเภทสินค้าแฟชั่นอื่นๆ:")
                 else:
                     fashion_item_type = ""
                 char_type = st.selectbox("👤 2.1 เลือกตัวละครหลัก", char_options, index=0, disabled=product_only_mode)
@@ -303,12 +293,24 @@ if uploaded_files:
                 elif is_thai_char and "ไทย" not in char_type:
                     char_type = f"{char_type} (หน้าตาคนไทย เอเชีย)"
 
-                char_style = st.selectbox("🎨 2.2 สไตล์ภาพตัวละคร (Art Style)", ["คนจริงสวยงาม (Realistic)", "การ์ตูน 2D (Anime/Cartoon)", "อวตาร 3D (Pixar/3D Avatar)"], disabled=no_char_mode)
-                char_skin = st.selectbox("🎨 2.3 สีผิวตัวละคร", ["ผิวขาว/สว่าง", "ผิวแทน/น้ำผึ้ง", "ผิวคล้ำเข้ม", "ไม่ระบุ (ให้ AI เลือกเอง)"], disabled=no_char_mode)
+                char_style = st.selectbox("🎨 2.2 สไตล์ภาพตัวละคร (Art Style)", ["คนจริงสวยงาม (Realistic)", "การ์ตูน 2D (Anime/Cartoon)", "อวตาร 3D (Pixar/3D Avatar)", "อื่นๆ"], disabled=no_char_mode)
+                if char_style == "อื่นๆ":
+                    char_style = st.text_input("ระบุสไตล์ภาพตัวละครอื่นๆ:", disabled=no_char_mode)
+                
+                char_skin = st.selectbox("🎨 2.3 สีผิวตัวละคร", ["ผิวขาว/สว่าง", "ผิวแทน/น้ำผึ้ง", "ผิวคล้ำเข้ม", "ไม่ระบุ (ให้ AI เลือกเอง)", "อื่นๆ"], disabled=no_char_mode)
+                if char_skin == "อื่นๆ":
+                    char_skin = st.text_input("ระบุสีผิวตัวละครอื่นๆ:", disabled=no_char_mode)
+                
+                char_traits_options = ["สวยน่ารัก", "เซ็กซี่เย้ายวน", "หน้าอกใหญ่", "หุ่นนายแบบ/นางแบบ", "หล่อเท่สมาร์ท", "แต่งตัวภูมิฐานดูแพง", "ตลกขบขัน", "ร่าเริงสดใส", "ลึกลับน่าค้นหา", "อื่นๆ"]
                 char_traits = st.multiselect("✨ 2.4 บุคลิกภาพและรูปร่าง (เลือกได้หลายข้อ)", 
-                    ["สวยน่ารัก", "เซ็กซี่เย้ายวน", "หน้าอกใหญ่", "หุ่นนายแบบ/นางแบบ", "หล่อเท่สมาร์ท", "แต่งตัวภูมิฐานดูแพง", "ตลกขบขัน", "ร่าเริงสดใส", "ลึกลับน่าค้นหา"],
+                    char_traits_options,
                     disabled=no_char_mode
                 )
+                if "อื่นๆ" in char_traits:
+                    custom_trait = st.text_input("ระบุบุคลิกภาพอื่นๆ:", disabled=no_char_mode)
+                    if custom_trait:
+                        char_traits.remove("อื่นๆ")
+                        char_traits.append(custom_trait)
                 
             with st.expander("🖼️ 2.4 ฉากหลังและบรรยากาศ", expanded=True):
                 bg_options = [
@@ -339,8 +341,13 @@ if uploaded_files:
                 if "ไม่พากย์เสียง" in use_sfx:
                     no_voiceover = True
                     
-                voice_type = st.selectbox("🎙️ 2.6 เสียงผู้พากย์ (Voice Type)", ["ไม่ระบุ (สุ่มให้เหมาะสม)", "ผู้หญิง", "ผู้ชาย", "เด็ก", "คนแก่", "หุ่นยนต์/AI", "สัตว์ (เช่น หมา/แมวบรรยาย)"], disabled=no_voiceover)
-                voice_emotion = st.selectbox("🎭 2.7 อารมณ์ในการพากย์ (Emotion)", ["ไม่ระบุ (สุ่มให้เหมาะสม)", "ตื่นเต้นเร้าใจ (Energetic)", "ตลกขบขัน/กวนๆ (Funny)", "จริงจัง/น่าเชื่อถือ (Professional)", "กระซิบ/น่าค้นหา (ASMR)", "ดราม่า/ซึ้งกินใจ", "สดใส/อ้อนๆ น่ารัก"], disabled=no_voiceover)
+                voice_type = st.selectbox("🎙️ 2.6 เสียงผู้พากย์ (Voice Type)", ["ไม่ระบุ (สุ่มให้เหมาะสม)", "ผู้หญิง", "ผู้ชาย", "เด็ก", "คนแก่", "หุ่นยนต์/AI", "สัตว์ (เช่น หมา/แมวบรรยาย)", "อื่นๆ"], disabled=no_voiceover)
+                if voice_type == "อื่นๆ":
+                    voice_type = st.text_input("ระบุเสียงผู้พากย์อื่นๆ:", disabled=no_voiceover)
+                
+                voice_emotion = st.selectbox("🎭 2.7 อารมณ์ในการพากย์ (Emotion)", ["ไม่ระบุ (สุ่มให้เหมาะสม)", "ตื่นเต้นเร้าใจ (Energetic)", "ตลกขบขัน/กวนๆ (Funny)", "จริงจัง/น่าเชื่อถือ (Professional)", "กระซิบ/น่าค้นหา (ASMR)", "ดราม่า/ซึ้งกินใจ", "สดใส/อ้อนๆ น่ารัก", "อื่นๆ"], disabled=no_voiceover)
+                if voice_emotion == "อื่นๆ":
+                    voice_emotion = st.text_input("ระบุอารมณ์ในการพากย์อื่นๆ:", disabled=no_voiceover)
     
             traits_str = ", ".join(char_traits) if char_traits else "ทั่วไป"
             no_bgm = "ไม่ใส่ซาวด์" in use_sfx
@@ -362,17 +369,19 @@ if uploaded_files:
     
             # ปุ่มกดสร้างวิดีโอ (Step 4)
             st.markdown("---")
-            st.subheader("📜 4. สร้าง Master Prompt สำหรับนำไปคุยกับ Gemini Advanced บนเว็บ")
-            if st.button("🚀 4.1 คลิกเพื่อสร้างคำสั่ง Prompt อัตโนมัติ", use_container_width=True):
-                    
+            st.subheader("🚀 4. วิเคราะห์และสร้าง Storyboard ด้วย AI (Gemini API)")
+            if st.button("🚀 4.1 วิเคราะห์ด้วย AI ทันที", use_container_width=True):
+                if not api_key:
+                    st.error("⚠️ กรุณาใส่ Gemini API Key ในเมนูด้านซ้ายก่อนครับ!")
+                else:
                     script_instruction = '3. คิดบทพากย์ (script) ที่ดึงดูด น่าสนใจ เป็นเรื่องราวเนื้อหาต่อเนื่องกันแบบเนียนๆ ตั้งแต่ซีนแรกจนถึงซีนสุดท้าย (ห้ามตัดจบดื้อๆ) และสอดคล้องกับ "เสียงผู้พากย์" และ "อารมณ์น้ำเสียง" อย่างเคร่งครัด'
                     video_voice_instruction = f'- **ความเนียนระดับ Extend:** บังคับสั่งให้เสียงและภาพต่อกันเนียนที่สุดตั้งแต่ซีน 1 ยันซีนสุดท้าย ใส่คำสั่งว่า "Continuous seamless extension from previous scene, EXACTLY the same character, same environment. Include synchronized voiceover narration in {voice_type} voice with {voice_emotion} tone, EXACTLY the same voice identity across all clips"'
                     
                     if no_char_mode:
-                        char_rule = f"- เป็นวิดีโอโชว์สินค้าเพียวๆ ไม่มีคนหรือสัตว์ในภาพเลย (100% Product B-Roll)\n- เน้นดนตรีประกอบน่าตื่นเต้น ตัดต่อเร้าใจ\n"
-                        scene_rule = f"2. ทุกซีนต้องเป็นภาพเจาะสินค้า (Product Shot) หรือภาพบรรยากาศสินค้า (Product in Environment) ห้ามวาดมนุษย์หรือตัวละครประหลาดลงในภาพเด็ดขาด\n   - บังคับการเขียน Video Prompt ให้ใช้เทคนิคกล้องหวือหวา (เช่น Dynamic zoom in, Orbit around product, Dolly in, Cinematic pan) เหมือนถ่ายทำโฆษณาสินค้าไฮเอนด์"
+                        char_rule = f"- เป็นวิดีโอโชว์สินค้าเพียวๆ ไม่มีคนหรือสัตว์ในภาพเลย (100% Product B-Roll)\\n- เน้นดนตรีประกอบน่าตื่นเต้น ตัดต่อเร้าใจ\\n"
+                        scene_rule = f"2. ทุกซีนต้องเป็นภาพเจาะสินค้า (Product Shot) หรือภาพบรรยากาศสินค้า (Product in Environment) ห้ามวาดมนุษย์หรือตัวละครประหลาดลงในภาพเด็ดขาด\\n   - บังคับการเขียน Video Prompt ให้ใช้เทคนิคกล้องหวือหวา (เช่น Dynamic zoom in, Orbit around product, Dolly in, Cinematic pan) เหมือนถ่ายทำโฆษณาสินค้าไฮเอนด์"
                         if no_voiceover:
-                            char_rule += "- **ย้ำ: ไม่ต้องคิดบทพูด (Voiceover) เด็ดขาด**\n"
+                            char_rule += "- **ย้ำ: ไม่ต้องคิดบทพูด (Voiceover) เด็ดขาด**\\n"
                             if no_bgm:
                                 script_instruction = '3. **ห้ามแต่งบทพูดและซาวด์เด็ดขาด** ให้ปล่อยฟิลด์ script ว่างไว้'
                                 video_voice_instruction = '- **ข้อบังคับเรื่องเสียง:** กำชับไว้ใน Video Prompt เสมอว่า "NO voiceover, NO dialogue, NO background music, perfectly silent, RAW footage"'
@@ -400,7 +409,7 @@ if uploaded_files:
                             focus_target = "ตัวสินค้า (Product)"
                             pan_target = "แพนกล้องโฟกัสที่ตัวสินค้าขณะสวมใส่"
 
-                        char_rule = f"- โหมดแฟชั่น (ประเภทสินค้า: {fashion_item_type}): เน้นการถ่ายทอดรูปทรงและดีไซน์ของสินค้า ให้บรรยากาศดูเรียลๆ เหมือนใช้มือถือถ่ายเอง\n- ตัวละครหลัก: {char_type}\n- สีผิว: {char_skin}\n- บุคลิกภาพ/รูปร่าง: {traits_str}\n- **กฎตัวละครและสินค้า (CRITICAL CHARACTER & PRODUCT):** สำหรับ 'ตัวละคร/บุคคล' ในรูป ให้สร้างหน้าตาคนขึ้นมาใหม่ทั้งหมด ห้ามก๊อปปี้หน้าตาคนจากรูปอ้างอิงเด็ดขาด! แต่สำหรับ 'ตัวสินค้า' ต้องเหมือนรูปที่แนบมาเป๊ะๆ 100% (ให้เหมือนตัดแปะตัวสินค้าจากรูปจริง) โดยคุณต้องเขียน `image_prompt` กำชับ AI ให้ชัดเจนว่า 'A completely NEW character person, but the product is EXACTLY identical to the reference image, perfect match.' และต้องบรรยายรายละเอียดสินค้าอย่างถี่ยิบ\n"
+                        char_rule = f"- โหมดแฟชั่น (ประเภทสินค้า: {fashion_item_type}): เน้นการถ่ายทอดรูปทรงและดีไซน์ของสินค้า ให้บรรยากาศดูเรียลๆ เหมือนใช้มือถือถ่ายเอง\\n- ตัวละครหลัก: {char_type}\\n- สีผิว: {char_skin}\\n- บุคลิกภาพ/รูปร่าง: {traits_str}\\n- **กฎตัวละครและสินค้า (CRITICAL CHARACTER & PRODUCT):** สำหรับ 'ตัวละคร/บุคคล' ในรูป ให้สร้างหน้าตาคนขึ้นมาใหม่ทั้งหมด ห้ามก๊อปปี้หน้าตาคนจากรูปอ้างอิงเด็ดขาด! แต่สำหรับ 'ตัวสินค้า' ต้องเหมือนรูปที่แนบมาเป๊ะๆ 100% (ให้เหมือนตัดแปะตัวสินค้าจากรูปจริง) โดยคุณต้องเขียน `image_prompt` กำชับ AI ให้ชัดเจนว่า 'A completely NEW character person, but the product is EXACTLY identical to the reference image, perfect match.' และต้องบรรยายรายละเอียดสินค้าอย่างถี่ยิบ\\n"
                         
                         scene_rule = f"""2. การจัดลำดับภาพแต่ละซีน (สำคัญมาก บังคับใช้ตามนี้):
    - ซีนช็อตที่ 1: เน้นภาพครึ่งตัว (Half-body) หรือเต็มตัว (Full-body shot) ตัวละครเดินอย่างเป็นธรรมชาติ (ไม่ต้องโฟกัสสินค้าใกล้เกินไป)
@@ -409,10 +418,10 @@ if uploaded_files:
    - ซีนช็อตที่ 4: **{pan_target}** อย่างชัดเจน
    (หากมีมากกว่า 4 ซีน ให้สลับหมุนเวียนให้เป็นธรรมชาติ)"""
                         
-                        fashion_motion_instruction = f'\n   - **ท่าทางการเคลื่อนไหวภาพ:** บังคับให้สร้างแอนิเมชันความเร็วปกติ ขยับแบบมนุษย์ทั่วไป "Natural everyday human movement, completely normal real-time speed, NO slow-mo, absolutely NO visual effects, RAW authentic smartphone footage, deep depth of field, NO bokeh"'
+                        fashion_motion_instruction = f'\\n   - **ท่าทางการเคลื่อนไหวภาพ:** บังคับให้สร้างแอนิเมชันความเร็วปกติ ขยับแบบมนุษย์ทั่วไป "Natural everyday human movement, completely normal real-time speed, NO slow-mo, absolutely NO visual effects, RAW authentic smartphone footage, deep depth of field, NO bokeh"'
                         
                         if no_voiceover:
-                            char_rule += "- **ย้ำ: ไม่ต้องคิดบทพูด (Voiceover) เด็ดขาด**\n"
+                            char_rule += "- **ย้ำ: ไม่ต้องคิดบทพูด (Voiceover) เด็ดขาด**\\n"
                             if no_bgm:
                                 script_instruction = '3. **ห้ามแต่งบทพูดและซาวด์เด็ดขาด** ให้ปล่อยฟิลด์ script ว่างไว้'
                                 video_voice_instruction = '- **ข้อบังคับเรื่องเสียง:** กำชับไว้ใน Video Prompt เสมอว่า "NO voiceover, NO dialogue, NO background music, perfectly silent, RAW footage"' + fashion_motion_instruction
@@ -422,8 +431,8 @@ if uploaded_files:
                         else:
                             video_voice_instruction += fashion_motion_instruction
                     else:
-                        char_rule = f"- ตัวละครหลัก: {char_type}\n- สีผิว: {char_skin}\n- บุคลิกภาพ/รูปร่าง: {traits_str}\n- **กฎตัวละครและสินค้า (CRITICAL CHARACTER & PRODUCT):** สำหรับ 'ตัวละคร/บุคคล' ในรูป ให้สร้างหน้าตาคนขึ้นมาใหม่ทั้งหมด ห้ามก๊อปปี้หน้าตาคนจากรูปอ้างอิงเด็ดขาด! แต่สำหรับ 'ตัวสินค้า' ต้องเหมือนรูปที่แนบมาเป๊ะๆ 100% (ให้เหมือนตัดแปะตัวสินค้าจากรูปจริง) โดยคุณต้องเขียน `image_prompt` กำชับ AI ให้ชัดเจนว่า 'A completely NEW character person, but the product is EXACTLY identical to the reference image, perfect match.' และต้องบรรยายรายละเอียดสินค้าอย่างถี่ยิบ\n"
-                        scene_rule = f"2. ซีนที่ 1 บังคับให้เป็นภาพตัวละครครึ่งตัว (Half-body) หรือเต็มตัวเดิน (Full-body walking) ห้ามโฟกัสสินค้าใกล้เกินไป ส่วนซีนอื่นๆ ต้องมีฉากที่เจาะจงนำเสนอ \"ตัวสินค้าชัดๆ (Product Shot)\" จำนวน {product_scene_count} ซีน และที่เหลือให้เป็น \"ฉากเล่าเรื่อง/ไลฟ์สไตล์ (Story/Lifestyle)\" ที่มีตัวละครหลัก"
+                        char_rule = f"- ตัวละครหลัก: {char_type}\\n- สีผิว: {char_skin}\\n- บุคลิกภาพ/รูปร่าง: {traits_str}\\n- **กฎตัวละครและสินค้า (CRITICAL CHARACTER & PRODUCT):** สำหรับ 'ตัวละคร/บุคคล' ในรูป ให้สร้างหน้าตาคนขึ้นมาใหม่ทั้งหมด ห้ามก๊อปปี้หน้าตาคนจากรูปอ้างอิงเด็ดขาด! แต่สำหรับ 'ตัวสินค้า' ต้องเหมือนรูปที่แนบมาเป๊ะๆ 100% (ให้เหมือนตัดแปะตัวสินค้าจากรูปจริง) โดยคุณต้องเขียน `image_prompt` กำชับ AI ให้ชัดเจนว่า 'A completely NEW character person, but the product is EXACTLY identical to the reference image, perfect match.' และต้องบรรยายรายละเอียดสินค้าอย่างถี่ยิบ\\n"
+                        scene_rule = f"2. ซีนที่ 1 บังคับให้เป็นภาพตัวละครครึ่งตัว (Half-body) หรือเต็มตัวเดิน (Full-body walking) ห้ามโฟกัสสินค้าใกล้เกินไป ส่วนซีนอื่นๆ ต้องมีฉากที่เจาะจงนำเสนอ 'ตัวสินค้าชัดๆ (Product Shot)' จำนวน {product_scene_count} ซีน และที่เหลือให้เป็น 'ฉากเล่าเรื่อง/ไลฟ์สไตล์ (Story/Lifestyle)' ที่มีตัวละครหลัก"
                         if no_voiceover and no_bgm: # Edge case general mode without voice and bgm
                             script_instruction = '3. **ห้ามแต่งบทพูดและซาวด์เด็ดขาด** ให้ปล่อยฟิลด์ script ว่างไว้'
                             video_voice_instruction = '- **ข้อบังคับเรื่องเสียง:** กำชับไว้ใน Video Prompt เสมอว่า "NO voiceover, NO dialogue, NO background music, perfectly silent, RAW footage"'
@@ -469,21 +478,73 @@ if uploaded_files:
    - **ความต่อเนื่องแบบ Extend เนียนๆ:** ตั้งแต่ซีน 2 เป็นต้นไป ให้บังคับสั่ง "Continuous seamless extension from the exact previous frame, exact same subject, exact same environment, no cuts, perfectly smooth transition"
    - การขยับ: เน้นสั่งเฉพาะ 'Camera motion' และ 'Subject motion' รวบกับ "NO text overlays" อย่างกระชับ พร้อมทั้งบังคับเขียนคำสั่งให้วิดีโอความเร็วปกติ (Normal speed, NO slow-motion), ไม่ต้องมีเอฟเฟคต์แต่งเติมใดๆ (NO digital effects) จัดแสงให้ออกมาเหมือนครีเอเตอร์รีวิวสินค้าเอง (Natural daily lighting, Creator POV, UGC style) และ "ห้ามจัดแสงสีระดับ Studio สวยเกินจริงเด็ดขาด!" (Strictly NO studio lighting)
    {video_voice_instruction}
-7. **Task 1 (ข้อมูล JSON อย่างเดียว):** เนื่องจากข้อจำกัดของระบบแชท ให้ส่งโครงสร้างบทวิเคราะห์ทั้งหมดมาเป็นโค้ด JSON อย่างเดียวโดยยึดตามโครงสร้างที่กำหนด (ไม่ต้องพยายามสร้างภาพกราฟิก)
+7. **Task 1 (ข้อมูล JSON อย่างเดียว):** ส่งโครงสร้างบทวิเคราะห์ทั้งหมดมาเป็นดค้ด JSON อย่างเดียวโดยยึดตามโครงสร้างที่กำหนด (ไม่ต้องพยายามสร้างภาพกราฟิก)
 8. **คำสั่งสำคัญเรื่องการตลาด:** หน้าที่ของคุณคือการเป็น Content Creator และนักการตลาดเชี่ยวชาญด้าน Affiliate Marketing บน TikTok โปรดดูภาพสินค้าที่ฉันแนบมานี้ และวิเคราะห์จุดขายเพื่อร่างข้อความโพสต์ใส่ลงใน `tiktok_post_data` ดังนี้
    - Product Details: เขียนสรรพคุณจุดเด่นชัดเจนของสินค้า (3-4 บรรทัด)
-   - Overlay Text: ข้อความพาดหัวฮุคคนดู สำหรับแปะไว้บนคลิปวิดีโอ (สั้นๆ กระชับ ไม่เกิน 10 คำ) ตามแต่ละซีนของวิดีโอ
+   - Overlay Text: ข้อความวางบนคลิปแบบแยกตามซีน (สั้นๆ กระชับ) **บังคับเขียนเรียงลำดับ เช่น "ซีน 1: [ข้อความ]\\nซีน 2: [ข้อความ]"**
    - Link Title: ชื่อปุ่มตะกร้าสีเหลืองที่ดึงดูดใจให้นิ้วลั่น (สั้นๆ เช่น ราคา "โปรไฟไหม้🔥 จิ้มเลย")
    - Post Caption: แคปชั่นใต้โพสต์สไตล์ TikTok เน้นภาษาเป็นกันเอง กระตุ้นให้อยากซื้อทันที
    - Hashtags: แฮชแท็กที่เกี่ยวข้องและเป็นกระแส (5-8 แท็ก)
 
 ขอให้ตอบกลับด้วยรูปแบบ JSON ตามโครงสร้างด้านล่างนี้เพียงอย่างเดียว:
 {VideoPlan.model_json_schema()}"""
-                    st.info("ขั้นตอนการทำ: 1) ถ่ายรูปสินค้าอัปโหลดขึ้นเว็บ Gemini 2) ก๊อปปี้คลิปบอร์ดข้อความกล่องดำด้านล่างเพื่อส่งให้มันคิดบทเป็น JSON")
-                    st.link_button("🌐 คลิกเปิดหน้าต่างเว็บ Gemini Advanced ตรงนี้", "https://gemini.google.com/app", use_container_width=True)
-                    st.code(master_prompt, language="text")
                     
-                    st.warning("💡 **คำแนะนำเพิ่มเติม:** เนื่องจากบางบัญชีของ Gemini ไม่รองรับการวาดรูปภาพ หรือติดปัญหาด้าน Policy หลังจากที่คุณได้โค้ด JSON ด้านล่างแล้ว **ให้คุณนำ `image_prompt` ของแต่ละซีน ไปเจนรูปในโปรแกรมฟรี เช่น Google ImageFX, Microsoft Designer หรือ Midjourney แทนครับ**")
+                    with st.spinner("⏳ AI กำลังวิเคราะห์รูปภาพและแต่งสคริปต์ (ใช้เวลาสักครู่)..."):
+                        try:
+                            # 1. อัปโหลดรูปทั้งหมดไปที่ Gemini
+                            uploaded_gemini_files = []
+                            for path in image_paths:
+                                uploaded_file = genai.upload_file(path)
+                                uploaded_gemini_files.append(uploaded_file)
+                                
+                            # 2. ค้นหารุ่นของโมเดลที่ดีที่สุดและรองรับจากบัญชี API ของคุณ
+                            available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+                            
+                            # ดึงโมเดล Flash ทั้งหมดที่มี (Flash เร็วและโควต้าฟรีเยอะสุด) และเรียงรุ่นใหม่ล่าสุดขึ้นก่อน
+                            flash_models = sorted([m for m in available_models if 'flash' in m.lower()], reverse=True)
+                            # ดึงโมเดล Pro ทั้งหมดที่มี
+                            pro_models = sorted([m for m in available_models if 'pro' in m.lower() and 'flash' not in m.lower()], reverse=True)
+                            
+                            # จัดคิวลองใช้ Flash ก่อน ถ้าไม่ได้ค่อยลอง Pro
+                            preferred_models = flash_models + pro_models
+                            
+                            response = None
+                            last_error = None
+                            
+                            for pref in preferred_models:
+                                if pref in available_models:
+                                    try:
+                                        model = genai.GenerativeModel(pref)
+                                        prompt_parts = uploaded_gemini_files + [master_prompt]
+                                        response = model.generate_content(
+                                            prompt_parts,
+                                            generation_config=genai.types.GenerationConfig(
+                                                temperature=0.7,
+                                                response_mime_type="application/json",
+                                            )
+                                        )
+                                        break # ลูปนี้สำเร็จแล้วให้หลุดลูปออกมาเลย
+                                    except Exception as e:
+                                        last_error = e
+                                        # ถ้าขัดข้อง (เช่นเกินโควต้า 429) ให้ลองรุ่นถัดไป
+                                        continue
+                            
+                            if not response:
+                                if last_error:
+                                    raise last_error
+                                else:
+                                    raise Exception("บัญชี API นี้ไม่สามารถใช้งาน Model ที่รองรับได้ครบถ้วน")
+                            
+                            # ตรวจสอบผลลัพธ์
+                            result_json = response.text
+                            # clean output just in case
+                            cleaned_json = result_json.replace("```json", "").replace("```", "").strip()
+                            video_plan = VideoPlan.model_validate_json(cleaned_json)
+                            st.session_state.video_plan_json = cleaned_json
+                            st.session_state.generated_images = {}
+                            st.success(f"✅ ประมวลผลเสร็จสิ้น! (สินค้า: {video_plan.product_name})")
+                        except Exception as e:
+                            st.error(f"❌ เกิดข้อผิดพลาดจาก API: {e}")
                 
 
 
@@ -508,55 +569,7 @@ if st.session_state.video_plan_json:
         os.makedirs("assets/video", exist_ok=True)
         os.makedirs("assets/audio", exist_ok=True)
 
-        # สร้างคำสั่ง Image Prompt แบบ Task-by-Task โดยส่ง JSON ให้ AI
-        st.markdown("---")
-        with st.expander("✨ เจนภาพทุกซีนแบบทีละ Task (ส่ง JSON ให้ AI รอรับคำสั่ง)", expanded=False):
-            st.write("ก๊อปปี้คำสั่งด้านล่างไปวางใน AI Image Generator (เช่น Gemini, ChatGPT) เพื่อเริ่มระบบวาดรูปทีละ Task ป้องกันปัญหา AI ขี้เกียจหรือวาดไม่ครบ")
-            
-            # เตรียม JSON สำหรับแต่ละ Task
-            json_prompts = []
-            for scene in video_plan.scenes:
-                json_prompts.append({
-                    "Task": f"Task {scene.scene_number}",
-                    "Scene": scene.scene_number,
-                    "Image_Prompt": scene.image_prompt
-                })
-            task_json_str = json.dumps(json_prompts, indent=2, ensure_ascii=False)
-            
-            # รูปแบบ Text Prompt
-            combined_text = f"""🚨 คำสั่งระดับสูงสุดในการสร้างรูปภาพ (อ่านกฎให้จบก่อนเริ่มทำ): 
-ฉันมีข้อมูล JSON ที่บรรจุคำสั่ง (Prompt) สำหรับสร้างรูปภาพทั้งหมด {len(video_plan.scenes)} ซีน 
-กฎระบบการทำงานแบบ Step-by-Step มอบหมายงานเป็น Task มีดังนี้:
-1. ให้คุณอ่าน Prompt จากก้อน JSON ด้านล่าง และวาดรูปเริ่มจาก "Task 1 (Scene 1)" เท่านั้น! (ห้ามวาดรูปอื่นมาก่อน และ ห้ามวาดรวมกันภาพเดียว 4 ช่อง)
-2. เมื่อคุณวาดรูปของ Task ปัจจุบันเสร็จ ให้คุณตอบกลับท้ายรูปภาพด้วยข้อความนี้: *"✅ วาดรูป Task [เลขปัจจุบัน] เสร็จแล้ว พิมพ์ 'Task [เลขถัดไป]' เพื่อไปต่อได้เลย"* แล้ว **หยุดชะงักรอคำสั่ง** (ไม่ต้องวาดต่อจนกว่าฉันจะสั่ง)
-3. เมื่อฉันพิมพ์คำสั่ง "Task 2", "Task 3" ...ไปเรื่อยๆ ให้คุณไปดึง Prompt ของ Scene ที่ตรงกับเลข Task ใน JSON มาวาดต่อไปจนครบ
 
-นี่คือข้อมูล JSON บรรจุ Prompt ทั้งหมด:
-```json
-{task_json_str}
-```
-
-เริ่มทำงานคำสั่งแรกเลย: **Task 1** (อ่าน JSON ด้านบนแล้ววาดรูป Scene 1 ออกมา)
-"""
-            
-            t1, t2 = st.tabs(["📝 แบบข้อความ (เอาไปวางใน Gemini/ChatGPT)", "⚙️ แบบรหัส JSON (เอาไปใช้กับ Automation Tools)"])
-            with t1:
-                st.code(combined_text, language="text")
-            with t2:
-                st.code(task_json_str, language="json")
-                
-            # เพิ่มส่วนก๊อปปี้ด่วนสำหรับ Task ต่อไป
-            st.markdown("---")
-            st.write("📋 **[ก๊อปปี้ด่วน] คำสั่งสำหรับไปต่อ Task ถัดไป (คลิกไอคอน Copy มุมขวาด้านในของกล่องได้เลย):**")
-            st.info("💡 สามารถกดก๊อปปี้ Task ถัดไปเตรียมไว้เพื่อไปปาใส่แชทต่อได้เลยครับ ไม่ต้องพิมพ์เอง")
-            
-            num_tasks = len(video_plan.scenes)
-            if num_tasks > 1:
-                cols = st.columns(min(4, num_tasks - 1))
-                for i in range(2, num_tasks + 1):
-                    with cols[(i-2) % len(cols)]:
-                        st.markdown(f"**ซีนที่ {i}:**")
-                        st.code(f"Task {i}", language="text")
         
 
         # ใช้ระบบ Tabs เป็นมิตรกับมือถือและลดการไถจอ
@@ -589,22 +602,23 @@ if st.session_state.video_plan_json:
         post_data = video_plan_data.get('tiktok_post_data')
         
         if post_data:
-            st.info("**📌 รายละเอียดสินค้า**")
-            st.code(post_data.get('product_details', ''), language="text")
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                st.success("**💬 ข้อความพาดหัวคลิป (Overlay Text)**")
-                st.code(post_data.get('overlay_text', ''), language="text")
-                
-                st.warning("**🛒 ชื่อปุ่มตะกร้า/ลิงก์**")
-                st.code(post_data.get('link_title', ''), language="text")
-            with col2:
-                st.info("**📝 แคปชั่นโพสต์ขาย (Caption)**")
-                st.code(post_data.get('post_caption', ''), language="text")
-                
-                st.write("**#️⃣ แฮชแท็ก**")
-                st.code(post_data.get('hashtags', ''), language="text")
+            # สร้างข้อความรวมสำหรับก๊อปปี้ไปวางใน Line/TikTok ได้เลย
+            combined_post = f"""{post_data.get('post_caption', '')}
+
+{post_data.get('hashtags', '')}
+
+🛒 พิกัดสั่งซื้อ (ชื่อลิงก์):
+👉 {post_data.get('link_title', '')}
+
+------------------
+💡 ข้อความวางบนคลิปตามซีน (Overlay Text):
+{post_data.get('overlay_text', '')}
+
+📌 รายละเอียดสินค้า (ใช้อ้างอิง):
+{post_data.get('product_details', '')}"""
+
+            st.success("**📋 ก๊อปปี้ข้อความทั้งหมดด้านล่างนี้ไปวางโพสต์ได้เลย!**")
+            st.code(combined_post, language="text")
         else:
             st.warning("⚠️ ไม่พบข้อมูลแคปชั่นและแฮชแท็กในโค้ด JSON กรุณากลับไปเช็ค Gemini หรือลองกดสร้างโค้ดใหม่อีกครั้งครับ")
     except Exception as e:
