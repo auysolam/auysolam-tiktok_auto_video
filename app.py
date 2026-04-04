@@ -207,20 +207,17 @@ st.markdown("อัปโหลดรูปสินค้า 1 รูป แล
 os.makedirs("assets/input", exist_ok=True)
 os.makedirs("output", exist_ok=True)
 
-# ส่วนตั้งค่าโหมดและ API Key 
-with st.sidebar:
-    st.header("⚙️ การตั้งค่าระบบ")
-    st.markdown("**⚙️ โหมดการทำงาน:** 🤖 ออโต้ (ใช้ API Key)")
-    
-    # รับ API Key
-    api_key = st.text_input("🔑 ใส่ Gemini API Key", type="password")
-    if api_key:
-        genai.configure(api_key=api_key)
-        st.success("✅ เชื่อมต่อ API Key แล้ว")
-    else:
-        st.warning("⚠️ กรุณาใส่ API Key ก่อนเริ่มใช้งาน")
-    
-    st.markdown("---")
+# ส่วนตั้งค่าโหมดและ API Key เอามาไว้หน้าจอหลักเพื่อรองรับการใช้งานบนมือถือ (ไม่ซ่อนใน Sidebar)
+st.markdown("### ⚙️ การตั้งค่าระบบ")
+api_key = st.text_input("🔑 ใส่ Gemini API Key (จำเป็นต้องใส่)", type="password", help="รับ API Key ได้ฟรีที่ Google AI Studio")
+
+if api_key:
+    genai.configure(api_key=api_key)
+    st.success("✅ เชื่อมต่อ API Key แล้ว")
+else:
+    st.warning("⚠️ กรุณาใส่ API Key ด้านบนก่อนเริ่มอัปโหลดรูปภาพ")
+
+st.markdown("---")
 st.subheader("📸 1. เริ่มต้นใหม่: อัปโหลดรูปภาพสินค้า")
 
 # ส่วนอัปโหลดภาพสินค้า
