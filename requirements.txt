@@ -3,3 +3,4 @@ pandas
 Pillow
 pydantic
 google-generativeai
+playwright

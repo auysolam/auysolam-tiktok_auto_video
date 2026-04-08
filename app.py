@@ -221,26 +221,36 @@ st.markdown("---")
 st.subheader("📸 1. เริ่มต้นใหม่: อัปโหลดรูปภาพสินค้า")
 
 # ส่วนอัปโหลดภาพสินค้า
-uploaded_files = st.file_uploader("📸 อัปโหลดรูปภาพสินค้าของคุณทั้งหมด (รับได้ 1-4 ภาพ) (JPG, PNG, WEBP)", type=['jpg', 'jpeg', 'png', 'webp'], accept_multiple_files=True)
+col1, col2 = st.columns(2)
+with col1:
+    product_info_file = st.file_uploader("📝 1. อัปโหลดรูปเพื่อใช้ดึงข้อมูล", type=['jpg', 'jpeg', 'png', 'webp'])
+with col2:
+    flow_ref_file = st.file_uploader("🖼️ 2. อัปโหลดรูปสำหรับแนบใน Flow", type=['jpg', 'jpeg', 'png', 'webp'])
 
-if uploaded_files:
-    if len(uploaded_files) > 4:
-        st.error("⚠️ กรุณาอัปโหลดรูปภาพไม่เกิน 4 รูปครับ เพื่อให้ระบบทำงานได้อย่างรวดเร็วและไม่โหลดหนักเกินไป")
-    else:
-        st.write(f"พบภาพทั้งหมด {len(uploaded_files)} ภาพ")
-        # รองรับ Mobile Layout 
-        num_cols = min(2, len(uploaded_files))
-        cols = st.columns(num_cols) 
+if product_info_file and flow_ref_file:
+    if True:
+        st.write("✅ อัปโหลดรูปภาพครบทั้ง 2 ส่วนแล้ว")
         image_paths = []
         
-        for i, file in enumerate(uploaded_files):
-            image = Image.open(file)
-            cols[i % num_cols].image(image, use_container_width=True)
-            image_path = f"assets/input/app_uploaded_product_{i}.jpg"
-            rgb_im = image.convert('RGB')
-            rgb_im.thumbnail((1080, 1920), Image.Resampling.LANCZOS)
-            rgb_im.save(image_path, format="JPEG", quality=95)
-            image_paths.append(image_path)
+        # รูปที่ 1: สำหรับ Gemini วิเคราะห์
+        img_info = Image.open(product_info_file)
+        rgb_info = img_info.convert('RGB')
+        rgb_info.thumbnail((1080, 1920), Image.Resampling.LANCZOS)
+        info_path = "assets/input/product_info.jpg"
+        rgb_info.save(info_path, format="JPEG", quality=95)
+        image_paths.append(info_path)
+        
+        # รูปที่ 2: สำหรับแนบใน Flow
+        img_ref = Image.open(flow_ref_file)
+        rgb_ref = img_ref.convert('RGB')
+        rgb_ref.thumbnail((1080, 1920), Image.Resampling.LANCZOS)
+        ref_path = "assets/input/app_uploaded_product_0.jpg"
+        rgb_ref.save(ref_path, format="JPEG", quality=95)
+        image_paths.append(ref_path)
+        
+        col_img1, col_img2 = st.columns(2)
+        col_img1.image(img_info, caption="รูปสำหรับดึงข้อมูลสินค้า", use_container_width=True)
+        col_img2.image(img_ref, caption="รูปสำหรับแนบใน Flow", use_container_width=True)
             
         st.markdown("---")
         
@@ -539,6 +549,13 @@ if uploaded_files:
                             video_plan = VideoPlan.model_validate_json(cleaned_json)
                             st.session_state.video_plan_json = cleaned_json
                             st.session_state.generated_images = {}
+                            
+                            # เพิ่มส่วนการเขียนไฟล์ให้ Bot ນําไปใช้
+                            import json as final_json
+                            with open("output/latest_plan.json", "w", encoding="utf-8") as f:
+                                # จัดระเบียบ JSON ให้สวยงามและใช้งานง่ายสำหรับบอท
+                                f.write(video_plan.model_dump_json(indent=4))
+                                
                             st.success(f"✅ ประมวลผลเสร็จสิ้น! (สินค้า: {video_plan.product_name})")
                         except Exception as e:
                             st.error(f"❌ เกิดข้อผิดพลาดจาก API: {e}")
@@ -552,11 +569,97 @@ if st.session_state.video_plan_json:
     try:
         video_plan = VideoPlan.model_validate_json(st.session_state.video_plan_json)
         
+        # ----------------------------------------------------
+        # ศูนย์ควบคุมบอทอัตโนมัติ (Remote Bot Control)
+        # ----------------------------------------------------
+        st.markdown("---")
+        st.subheader("🎮 5. ศูนย์ควบคุมบอทอัตโนมัติ (Remote Bot Control)")
+        st.info("ควบคุมบอทบนคอมพิวเตอร์ของคุณจากมือถือ สะดวกสบาย ไม่ต้องก๊อปวางเอง!")
+        
+        # ฟังก์ชันสั่งรันบอท
+        def start_bot():
+            import subprocess
+            if os.name == 'nt':
+                # รันแยกจอใน Windows จะได้เห็นหน้าต่างชัด
+                subprocess.Popen(["cmd.exe", "/c", "start", "python", "bot_flow.py"])
+            else:
+                subprocess.Popen(["python", "bot_flow.py"])
+            st.toast("🚀 สั่งรันบอทแล้ว กรุณาสังเกตหน้าจอคอมพิวเตอร์", icon="🤖")
+
+        def send_action(action):
+            state_file = "output/bot_state.json"
+            try:
+                with open(state_file, "r", encoding="utf-8") as f:
+                    state = json.load(f)
+            except:
+                state = {}
+            state["user_action"] = action
+            with open(state_file, "w", encoding="utf-8") as fw:
+                json.dump(state, fw, ensure_ascii=False, indent=4)
+            st.rerun()
+
+        # อ่านสถานะบอท
+        bot_state = {}
+        try:
+            with open("output/bot_state.json", "r", encoding="utf-8") as f:
+                bot_state = json.load(f)
+        except:
+            pass
+
+        # แสดงกล่องสถานะ
+        with st.container(border=True):
+            col_b1, col_b2 = st.columns([1, 2])
+            with col_b1:
+                st.markdown("**สถานะปัจจุบันของบอท:**")
+                
+                b_status = bot_state.get("status", "idle")
+                if b_status == "running": status_color = "🟢 รันนิ่ง"
+                elif b_status == "waiting": status_color = "🟡 กำลังรอ..."
+                elif b_status == "finished": status_color = "🔵 เสร็จสิ้น"
+                else: status_color = "⚪ ไม่ได้ทำงาน"
+                
+                st.markdown(f"### {status_color}")
+                st.write(f"**ข้อความ:** {bot_state.get('message', 'ว่างเปล่า')}")
+                
+                if "progress" in bot_state:
+                    prog_val = min(100, max(0, bot_state.get("progress", 0)))
+                    st.progress(prog_val / 100.0)
+                
+                st.markdown("---")
+                # ปุ่มควบคุม
+                if st.button("🚀 เปิดบอท (รันครั้งแรก / เริ่มใหม่)", use_container_width=True):
+                    start_bot()
+                
+                if b_status == "waiting":
+                    st.success("👇 บอทกำลังรอคำสั่งจากคุณ")
+                    if st.button("✅ ยืนยัน / ทำงานต่อ", type="primary", use_container_width=True):
+                        send_action("continue")
+                else:
+                    if st.button("🔄 รีเฟรชสถานะ (ดูหน้าจอล่าสุด)", use_container_width=True):
+                        st.rerun()
+                
+                if st.button("🛑 หยุดบอทชั่วคราว", use_container_width=True):
+                    send_action("stop")
+
+            with col_b2:
+                st.markdown("**📸 หน้าจอสดจากคอมพิวเตอร์ (Live Preview):**")
+                ss_path = bot_state.get("screenshot_path", "")
+                if ss_path and os.path.exists(ss_path):
+                    import time
+                    try:
+                        # Append timestamp to bypass caching
+                        st.image(ss_path, use_container_width=True)
+                    except:
+                        st.info("กำลังโหลดภาพ...")
+                else:
+                    st.info("❌ ยังไม่มีภาพหน้าจอ หรือบอทยังไม่เริ่มทำงาน")
+
+        # ----------------------------------------------------
         # โชว์แท็บจัดกลุ่มตามซีน
         st.markdown("---")
         st.subheader("📋 แผนการทำวิดีโอรายฉาก (Storyboard & Prompts)")
         st.info("แตะขวา/ซ้าย ที่แท็บเพื่อดูรายละเอียดและอัปโหลดวิดีโอทีละซีน👇")
-        st.markdown("*(ก๊อปปี้ Image Prompt แยกไปเจนภาพในเว็บด้านล่างนี้ได้เลย)*")
+        st.markdown("*(สำหรับกรณีที่คุณเจอมือเอง ไม่ใช้บอท ก๊อปปี้ไปเจนได้เลย)*")
         col_btn1, col_btn2 = st.columns(2)
         with col_btn1:
             st.link_button("🖼️ สร้างรูปภาพด้วย Gemini", "https://gemini.google.com/app", use_container_width=True)
@@ -565,9 +668,6 @@ if st.session_state.video_plan_json:
 
         os.makedirs("assets/video", exist_ok=True)
         os.makedirs("assets/audio", exist_ok=True)
-
-
-        
 
         # ใช้ระบบ Tabs เป็นมิตรกับมือถือและลดการไถจอ
         scene_tabs = st.tabs([f"🎬 ซีน {scene.scene_number}" for scene in video_plan.scenes])
