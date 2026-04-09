@@ -137,7 +137,6 @@ st.markdown("""
         h1 {
             font-size: 1.8rem !important;
             text-align: left;
-            color: #ffffff !important;
             margin-bottom: 0.5rem !important;
             line-height: 1.3 !important;
             font-weight: 600 !important;
@@ -149,12 +148,10 @@ st.markdown("""
             margin-top: 1.5rem !important;
             padding-bottom: 0.5rem !important;
             border-bottom: 1px solid #2a2a2a;
-            color: #ececec !important;
         }
         
         h3 {
             font-size: 1.15rem !important;
-            color: #d8d8d8 !important;
         }
 
         /* ขยายระยะสัมผัส (Touch Target) ของตัวเลือก Checkbox/Radio ให้กดง่ายในมือถือ */
@@ -446,13 +443,13 @@ if product_info_file and flow_ref_file:
 
                     if no_char_mode or "คนจริง" in char_style:
                         image_style_instruction = '   - **สไตล์ภาพถ่ายสุดเรียล (ห้ามเบลอฉากหลัง):** ให้ระบุใน prompt เสมอว่า "Ultra-realistic raw smartphone photo, extreme deep depth of field, everything in absolute focus. The background environment MUST BE EXTREMELY SHARP AND CLEAR. Absolutely NO bokeh, NO background blur at all." เพื่อให้ภาพดูเรียลเหมือนปิดโหมด Portrait'
-                        video_style_instruction = '   - **สไตล์เรียลๆ ห้ามเบลอฉากหลัง:** บังคับเพิ่ม "Ultra-realistic raw smartphone footage, authentic daily life snapshot, extreme deep depth of field, everything in absolute focus, NO bokeh, completely sharp background, absolutely NO blurry background" เสมอ'
+                        video_style_instruction = '   - **สไตล์เรียลๆ (ความเร็วปกติ ห้ามสโลว์โมชั่น / ห้ามเบลอฉากหลัง):** บังคับเพิ่ม "Ultra-realistic raw smartphone footage, authentic daily life snapshot, normal real-time speed, absolutely NO slow motion, extreme deep depth of field, everything in absolute focus, NO bokeh, completely sharp background, absolutely NO blurry background" เสมอ'
                     elif "การ์ตูน 2D" in char_style:
                         image_style_instruction = '   - **สไตล์ภาพการ์ตูน 2D:** ให้กำหนดสไตล์ภาพเป็น "High quality 2D Anime style, vibrant colors, flat shading, Ghibli style background, completely sharp focus, NO bokeh" และ "ห้ามทำหน้าชัดหลังเบลอเด็ดขาด"'
-                        video_style_instruction = '   - **สไตล์วิดีโอการ์ตูน 2D:** บังคับเพิ่ม "High quality 2D Anime animation, vibrant colors, flat shading, Ghibli style, extremely sharp focus, NO bokeh, completely sharp background, NO blurry background" เสมอ'
+                        video_style_instruction = '   - **สไตล์วิดีโอการ์ตูน 2D (ความเร็วปกติ ห้ามสโลว์โมชั่น):** บังคับเพิ่ม "High quality 2D Anime animation, vibrant colors, flat shading, Ghibli style, normal real-time speed, absolutely NO slow motion, extremely sharp focus, NO bokeh, completely sharp background, NO blurry background" เสมอ'
                     else: # อวตาร 3D
                         image_style_instruction = '   - **สไตล์ภาพอวตาร 3D:** ให้กำหนดสไตล์ภาพเป็น "High quality 3D Pixar style, cute 3D character, vibrant lighting, highly detailed 3D render, completely sharp focus, NO bokeh" และ "ห้ามทำหน้าชัดหลังเบลอเด็ดขาด"'
-                        video_style_instruction = '   - **สไตล์วิดีโออวตาร 3D:** บังคับเพิ่ม "High quality 3D Pixar style animation, highly detailed 3D render, extremely sharp focus, NO bokeh, completely sharp background, NO blurry background" เสมอ'
+                        video_style_instruction = '   - **สไตล์วิดีโออวตาร 3D (ความเร็วปกติ ห้ามสโลว์โมชั่น):** บังคับเพิ่ม "High quality 3D Pixar style animation, highly detailed 3D render, normal real-time speed, absolutely NO slow motion, extremely sharp focus, NO bokeh, completely sharp background, NO blurry background" เสมอ'
 
                     master_prompt = f"""คุณคือผู้เชี่ยวชาญด้านการทำวิดีโอสั้น (TikTok/Reels) สำหรับ Affiliate Marketing หรือขายของออนไลน์
 งานของคุณคือวิเคราะห์ 'ภาพสินค้า' ที่ฉันแนบมานี้ และสร้างแผนการทำวิดีโอ (Video Plan) จำนวน {num_scenes} ซีน
@@ -470,17 +467,18 @@ if product_info_file and flow_ref_file:
 {script_instruction}
 4. เขียนบทพากย์ให้สามารถพูดจบได้ภายใน {scene_duration} วินาทีต่อซีน 
 5. เขียน image_prompt เป็นภาษาอังกฤษ เพื่อใช้ **เจนภาพนิ่งด้วย Gemini (Imagen 3)**
-   - **สำคัญมาก (การตั้งชื่อไฟล์):** บังคับให้คุณขึ้นต้นประโยคแรกของ `image_prompt` ทุกซีนด้วยคำว่า "Scene_1_", "Scene_2_", "Scene_3_" ... ตามลำดับซีนเสมอ (เช่น "Scene_1_ Vertical 9:16 aspect ratio...") เพื่อให้เวลาที่ฉันกดดาวน์โหลดรูปภาพที่คุณวาด ชื่อไฟล์จะได้ไม่ซ้ำกันและง่ายต่อการอัปโหลด
+   - **สำคัญมาก (การติดป้ายชื่อซีน):** บังคับให้คุณขึ้นต้นประโยคแรกของ `image_prompt` ทุกซีนด้วยคำว่า "Scene 1: ", "Scene 2: " ... ตามลำดับซีนเสมอ (เช่น "Scene 1: Vertical 9:16 aspect ratio...")
    - บังคับให้ใส่: "Vertical 9:16 aspect ratio, NO text overlays, NO typography, ONLY one single distinct scene, NO 4-panel grid, NO split screen"
    - **กฎการแยกภาพ (No Grid/Collage):** ห้ามให้ AI เจนภาพ 4 ซีนรวมอยู่ในรูปเดียว (กากบาท/ตาราง 4 ช่อง) อย่างเด็ดขาด! บังคับเขียนสั่งท้าย prompt ว่า "Single full frame, absolutely NO multi-panel collage"
    - **กฎการล็อกเป้า 100% (CRITICAL UNIFIED CORE_PROMPT):** คุณต้องรวบรวมรายละเอียดทั้งหมด ได้แก่ 1) หน้าตาและสรีระของตัวละคร (สีผม ทรงผม ชุดที่ใส่) 2) ลักษณะของรูปภาพสินค้า (อักษร ลายพิมพ์ สี) แบบละเอียดโคตรๆ และ 3) ฉากหลังที่เจาะจงมาก (เช่น A specific modern kitchen) 
-   - นำข้อมูลทั้ง 3 ข้อด้านบนมาแต่งรวมกันเป็น 1 ย่อหน้า เรียกว่า `[CORE_PROMPT]` และ **คุณมีหน้าที่ต้อง COPY และ PASTE `[CORE_PROMPT]` นี้ นำหน้า `image_prompt` ในทุกๆ ซีนย่อย ห้ามตกหล่นแม้แต่ตัวอักษรเดียว!**
+   - นำข้อมูลทั้ง 3 ข้อด้านบนมาแต่งรวมกันเป็น 1 ย่อหน้า เรียกว่า `[CORE_PROMPT]` และ **คุณมีหน้าที่เรียงลำดับดังนี้: ขึั้นต้นด้วย "Scene X: " เป็นคำแรกสุด จากนั้นเว้นวรรคและตามด้วย `[CORE_PROMPT]` เป็นย่อหน้าแรกสุดใน `image_prompt` ของทุกๆ ซีนย่อย ห้ามตกหล่นแม้แต่ตัวอักษรเดียว! (ห้ามเอาอะไรมาบังหน้าคำว่า Scene X: เด็ดขาด)**
    - ส่วนที่เปลี่ยนได้ในแต่ละซีน คือแค่ "ท่าทางโพส (Pose)" และ "มุมกล้อง (Camera Angle)" ต่อท้าย `[CORE_PROMPT]` เท่านั้น! เพื่อบังคับให้ AI สร้างภาพ นางแบบเดิม ฉากเดิม สินค้าเดิม ตลอดทั้งคลิป!
    - **กฎเหล็กเพื่อความชัด (ห้ามเบลอฉากหลังเด็ดขาด):** บังคับให้ทุกประโยค `image_prompt` จบด้วยคำสั่งนี้เสมอ: "Taken with an ordinary smartphone camera, zero portrait mode. The background environment MUST BE 100% crystal clear and fully visible in sharp focus. Extreme deep depth of field, absolutely NO bokeh, NO background blur at all, perfectly sharp scenery background. Correct anatomical hands."
 {image_style_instruction}
    - บรรยายแสงเงา บรรยากาศ มุมกล้อง ให้เป็นแบบ "แสงธรรมชาติทั่วไป (Natural daily lighting)" ห้ามจัดแสงสวยหรูแบบสตูดิโอเด็ดขาด และห้ามสั่งให้วาดป้ายราคาหรือข้อความทับลงไปในภาพเด็ดขาด
 6. เขียน video_prompt เป็นภาษาอังกฤษ สำหรับ **เจนวนิเมชัน+เสียง บน Google Labs Flow**
 {video_style_instruction}
+   - **สำคัญมาก (การติดป้ายชื่อซีน):** บังคับให้คุณขึ้นต้นประโยคของ `video_prompt` ทุกซีนด้วยคำว่า "Scene 1: ", "Scene 2: " ... ตามลำดับซีนเสมอ เช่นเดียวกับภาพนิ่ง
    - **กฎการพาแพนกล้อง (มุมด้านหลัง):** หากไม่มีความจำเป็น ให้หลีกเลี่ยงการเขียน Prompt สั่งแพนกล้องไปข้างหลัง ให้เน้นขยับกล้องเฉพาะด้านหน้า (Front view only) แต่ถ้าจำเป็นต้องเห็นด้านหลัง บังคับเขียนคำสั่งเพิ่มว่า "Back design is exactly identical to the front pattern" เพื่อไม่ให้ AI มโนลวดลายประหลาดๆ ขึ้นมาเอง
    - **ความต่อเนื่องแบบ Extend เนียนๆ:** ตั้งแต่ซีน 2 เป็นต้นไป ให้บังคับสั่ง "Continuous seamless extension from the exact previous frame, exact same subject, exact same environment, no cuts, perfectly smooth transition"
    - การขยับ: เน้นสั่งเฉพาะ 'Camera motion' และ 'Subject motion' รวบกับ "NO text overlays" อย่างกระชับ พร้อมทั้งบังคับเขียนคำสั่งให้วิดีโอความเร็วปกติ (Normal speed, NO slow-motion), ไม่ต้องมีเอฟเฟคต์แต่งเติมใดๆ (NO digital effects) จัดแสงให้ออกมาเหมือนครีเอเตอร์รีวิวสินค้าเอง (Natural daily lighting, Creator POV, UGC style) และ "ห้ามจัดแสงสีระดับ Studio สวยเกินจริงเด็ดขาด!" (Strictly NO studio lighting)
@@ -528,7 +526,13 @@ if product_info_file and flow_ref_file:
                                             generation_config=genai.types.GenerationConfig(
                                                 temperature=0.7,
                                                 response_mime_type="application/json",
-                                            )
+                                            ),
+                                            safety_settings=[
+                                                {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+                                                {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+                                                {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+                                                {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+                                            ]
                                         )
                                         break # ลูปนี้สำเร็จแล้วให้หลุดลูปออกมาเลย
                                     except Exception as e:
@@ -542,8 +546,17 @@ if product_info_file and flow_ref_file:
                                 else:
                                     raise Exception("บัญชี API นี้ไม่สามารถใช้งาน Model ที่รองรับได้ครบถ้วน")
                             
-                            # ตรวจสอบผลลัพธ์
-                            result_json = response.text
+                            # ตรวจสอบการบล็อกจากระบบ Safety ของ Google
+                            try:
+                                result_json = response.text
+                            except ValueError as e:
+                                # ถ้า error เกี่ยวกับ finish_reason (เช่น โดนบล็อกเนื้อหา)
+                                if response.candidates and response.candidates[0].finish_reason:
+                                    fr = response.candidates[0].finish_reason
+                                    raise Exception(f"Google AI บล็อกการสร้างข้อความเนื่องจากละเมิดนโยบายความปลอดภัย (Finish Reason: {fr}). รูปภาพหรือคำบรรยายที่คุณให้มาอาจมีเนื้อหาล่อแหลม รุนแรง หรือผิดกฎของ Google โปรดเปลี่ยนรูปภาพหรือลองใหม่อีกครั้ง")
+                                else:
+                                    raise e
+
                             # clean output just in case
                             cleaned_json = result_json.replace("```json", "").replace("```", "").strip()
                             video_plan = VideoPlan.model_validate_json(cleaned_json)
@@ -569,93 +582,7 @@ if st.session_state.video_plan_json:
     try:
         video_plan = VideoPlan.model_validate_json(st.session_state.video_plan_json)
         
-        # ----------------------------------------------------
-        # ศูนย์ควบคุมบอทอัตโนมัติ (Remote Bot Control)
-        # ----------------------------------------------------
-        st.markdown("---")
-        st.subheader("🎮 5. ศูนย์ควบคุมบอทอัตโนมัติ (Remote Bot Control)")
-        st.info("ควบคุมบอทบนคอมพิวเตอร์ของคุณจากมือถือ สะดวกสบาย ไม่ต้องก๊อปวางเอง!")
-        
-        # ฟังก์ชันสั่งรันบอท
-        def start_bot():
-            import subprocess
-            if os.name == 'nt':
-                # รันแยกจอใน Windows จะได้เห็นหน้าต่างชัด
-                subprocess.Popen(["cmd.exe", "/c", "start", "python", "bot_flow.py"])
-            else:
-                subprocess.Popen(["python", "bot_flow.py"])
-            st.toast("🚀 สั่งรันบอทแล้ว กรุณาสังเกตหน้าจอคอมพิวเตอร์", icon="🤖")
 
-        def send_action(action):
-            state_file = "output/bot_state.json"
-            try:
-                with open(state_file, "r", encoding="utf-8") as f:
-                    state = json.load(f)
-            except:
-                state = {}
-            state["user_action"] = action
-            with open(state_file, "w", encoding="utf-8") as fw:
-                json.dump(state, fw, ensure_ascii=False, indent=4)
-            st.rerun()
-
-        # อ่านสถานะบอท
-        bot_state = {}
-        try:
-            with open("output/bot_state.json", "r", encoding="utf-8") as f:
-                bot_state = json.load(f)
-        except:
-            pass
-
-        # แสดงกล่องสถานะ
-        with st.container(border=True):
-            col_b1, col_b2 = st.columns([1, 2])
-            with col_b1:
-                st.markdown("**สถานะปัจจุบันของบอท:**")
-                
-                b_status = bot_state.get("status", "idle")
-                if b_status == "running": status_color = "🟢 รันนิ่ง"
-                elif b_status == "waiting": status_color = "🟡 กำลังรอ..."
-                elif b_status == "finished": status_color = "🔵 เสร็จสิ้น"
-                else: status_color = "⚪ ไม่ได้ทำงาน"
-                
-                st.markdown(f"### {status_color}")
-                st.write(f"**ข้อความ:** {bot_state.get('message', 'ว่างเปล่า')}")
-                
-                if "progress" in bot_state:
-                    prog_val = min(100, max(0, bot_state.get("progress", 0)))
-                    st.progress(prog_val / 100.0)
-                
-                st.markdown("---")
-                # ปุ่มควบคุม
-                if st.button("🚀 เปิดบอท (รันครั้งแรก / เริ่มใหม่)", use_container_width=True):
-                    start_bot()
-                
-                if b_status == "waiting":
-                    st.success("👇 บอทกำลังรอคำสั่งจากคุณ")
-                    if st.button("✅ ยืนยัน / ทำงานต่อ", type="primary", use_container_width=True):
-                        send_action("continue")
-                else:
-                    if st.button("🔄 รีเฟรชสถานะ (ดูหน้าจอล่าสุด)", use_container_width=True):
-                        st.rerun()
-                
-                if st.button("🛑 หยุดบอทชั่วคราว", use_container_width=True):
-                    send_action("stop")
-
-            with col_b2:
-                st.markdown("**📸 หน้าจอสดจากคอมพิวเตอร์ (Live Preview):**")
-                ss_path = bot_state.get("screenshot_path", "")
-                if ss_path and os.path.exists(ss_path):
-                    import time
-                    try:
-                        # Append timestamp to bypass caching
-                        st.image(ss_path, use_container_width=True)
-                    except:
-                        st.info("กำลังโหลดภาพ...")
-                else:
-                    st.info("❌ ยังไม่มีภาพหน้าจอ หรือบอทยังไม่เริ่มทำงาน")
-
-        # ----------------------------------------------------
-        # โชว์แท็บจัดกลุ่มตามซีน
         st.markdown("---")
         st.subheader("📋 แผนการทำวิดีโอรายฉาก (Storyboard & Prompts)")
         st.info("แตะขวา/ซ้าย ที่แท็บเพื่อดูรายละเอียดและอัปโหลดวิดีโอทีละซีน👇")
@@ -699,23 +626,24 @@ if st.session_state.video_plan_json:
         post_data = video_plan_data.get('tiktok_post_data')
         
         if post_data:
-            # สร้างข้อความรวมสำหรับก๊อปปี้ไปวางใน Line/TikTok ได้เลย
-            combined_post = f"""{post_data.get('post_caption', '')}
-
-{post_data.get('hashtags', '')}
-
-🛒 พิกัดสั่งซื้อ (ชื่อลิงก์):
-👉 {post_data.get('link_title', '')}
-
-------------------
-💡 ข้อความวางบนคลิปตามซีน (Overlay Text):
-{post_data.get('overlay_text', '')}
-
-📌 รายละเอียดสินค้า (ใช้อ้างอิง):
-{post_data.get('product_details', '')}"""
-
-            st.success("**📋 ก๊อปปี้ข้อความทั้งหมดด้านล่างนี้ไปวางโพสต์ได้เลย!**")
-            st.code(combined_post, language="text")
+            # แบ่งเป็นหมวดหมู่ให้ก๊อปปี้ง่ายๆ
+            st.success("**📋 แบ่งหมวดหมู่ให้ก๊อปปี้ง่ายๆ กดที่ปุ่ม Copy มุมขวาของแต่ละกล่องได้เลย!**")
+            
+            st.markdown("### 📝 1. คำบรรยายโพสต์ (Caption & Hashtags)")
+            st.info("💡 นำไปวางในช่อง 'คำอธิบายวิดีโอ' (Description) ก่อนกดโพสต์")
+            st.code(f"{post_data.get('post_caption', '')}\n\n{post_data.get('hashtags', '')}", language="text")
+            
+            st.markdown("### 🛒 2. พิกัดสั่งซื้อ (Link Title)")
+            st.info("💡 นำไปตั้งเป็นชื่อตอน 'เพิ่มลิงก์สินค้า' (Add Product Link)")
+            st.code(post_data.get('link_title', ''), language="text")
+            
+            st.markdown("### 💡 3. ข้อความพาดหัวคลิป (Overlay Text)")
+            st.info("💡 เอาไว้ใส่เป็นสติกเกอร์ข้อความ แปะไว้บนตัวคลิปวิดีโอเพื่อดึงดูดสายตาคนดู")
+            st.code(post_data.get('overlay_text', ''), language="text")
+            
+            if post_data.get('product_details', ''):
+                st.markdown("### 📌 4. สรุปจุดเด่นสินค้า (สำหรับใช้อ้างอิง)")
+                st.code(post_data.get('product_details', ''), language="text")
         else:
             st.warning("⚠️ ไม่พบข้อมูลแคปชั่นและแฮชแท็กในโค้ด JSON กรุณากลับไปเช็ค Gemini หรือลองกดสร้างโค้ดใหม่อีกครั้งครับ")
     except Exception as e:

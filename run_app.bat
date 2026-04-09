@@ -14,7 +14,7 @@ if not exist venv (
 
 echo [2/3] Installing Required Packages...
 venv\Scripts\python.exe -m pip install --upgrade pip >nul 2>&1
-venv\Scripts\python.exe -m pip install google-generativeai pydantic python-dotenv moviepy==1.0.3 edge-tts streamlit pillow
+venv\Scripts\python.exe -m pip install google-generativeai pydantic Pillow streamlit
 
 echo.
 echo ==================================================
