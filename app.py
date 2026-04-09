@@ -355,7 +355,7 @@ if uploaded_file:
             st.subheader("🚀 4. วิเคราะห์และสร้าง Storyboard ด้วย AI (Gemini API)")
             if st.button("🚀 4.1 วิเคราะห์ด้วย AI ทันที", use_container_width=True):
                 if not api_key:
-                    st.error("⚠️ กรุณาใส่ Gemini API Key ในเมนูด้านซ้ายก่อนครับ!")
+                    st.error("⚠️ ไม่พบ Gemini API Key ในระบบ กรุณาตั้งค่า Environment Variable (GEMINI_API_KEY) ก่อนเริ่มใช้งานครับ!")
                 else:
                     script_instruction = '3. คิดบทพากย์ (script) ที่ดึงดูด น่าสนใจ เป็นเรื่องราวเนื้อหาต่อเนื่องกันแบบเนียนๆ ตั้งแต่ซีนแรกจนถึงซีนสุดท้าย (ห้ามตัดจบดื้อๆ) และสอดคล้องกับ "เสียงผู้พากย์" และ "อารมณ์น้ำเสียง" อย่างเคร่งครัด'
                     video_voice_instruction = f'- **ความเนียนระดับ Extend:** บังคับสั่งให้เสียงและภาพต่อกันเนียนที่สุดตั้งแต่ซีน 1 ยันซีนสุดท้าย ใส่คำสั่งว่า "Continuous seamless extension from previous scene, EXACTLY the same character, same environment. Include synchronized voiceover narration in {voice_type} voice with {voice_emotion} tone, EXACTLY the same voice identity across all clips"'
