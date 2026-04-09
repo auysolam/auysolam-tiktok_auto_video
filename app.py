@@ -463,9 +463,10 @@ if uploaded_file:
 6. เขียน video_prompt เป็นภาษาอังกฤษ สำหรับ **เจนวนิเมชัน+เสียง บน Google Labs Flow**
 {video_style_instruction}
    - **สำคัญมาก (การติดป้ายชื่อซีน):** บังคับให้คุณขึ้นต้นประโยคของ `video_prompt` ทุกซีนด้วยคำว่า "Scene 1: ", "Scene 2: " ... ตามลำดับซีนเสมอ เช่นเดียวกับภาพนิ่ง
+   - **กฎความเร็วปกติ (SUPER CRITICAL NO SLOW MOTION):** ห้ามสร้าง Prompt ที่ทำให้เกิดภาพช้าเด็ดขาด! บังคับให้คุณต้องเติมคำสั่งนี้ลงไปในประโยคของ `video_prompt` ทุกซีนเสมอ: "1.0x normal everyday real-time speed, absolutely NO slow motion whatsoever"
    - **กฎการพาแพนกล้อง (มุมด้านหลัง):** หากไม่มีความจำเป็น ให้หลีกเลี่ยงการเขียน Prompt สั่งแพนกล้องไปข้างหลัง ให้เน้นขยับกล้องเฉพาะด้านหน้า (Front view only) แต่ถ้าจำเป็นต้องเห็นด้านหลัง บังคับเขียนคำสั่งเพิ่มว่า "Back design is exactly identical to the front pattern" เพื่อไม่ให้ AI มโนลวดลายประหลาดๆ ขึ้นมาเอง
    - **ความต่อเนื่องแบบ Extend เนียนๆ:** ตั้งแต่ซีน 2 เป็นต้นไป ให้บังคับสั่ง "Continuous seamless extension from the exact previous frame, exact same subject, exact same environment, no cuts, perfectly smooth transition"
-   - การขยับ: เน้นสั่งเฉพาะ 'Camera motion' และ 'Subject motion' รวบกับ "NO text overlays" อย่างกระชับ พร้อมทั้งบังคับเขียนคำสั่งให้วิดีโอความเร็วปกติ (Normal speed, NO slow-motion), ไม่ต้องมีเอฟเฟคต์แต่งเติมใดๆ (NO digital effects) จัดแสงให้ออกมาเหมือนครีเอเตอร์รีวิวสินค้าเอง (Natural daily lighting, Creator POV, UGC style) และ "ห้ามจัดแสงสีระดับ Studio สวยเกินจริงเด็ดขาด!" (Strictly NO studio lighting)
+   - การขยับ: เน้นสั่งเฉพาะ 'Camera motion' และ 'Subject motion' รวบกับ "NO text overlays" อย่างกระชับ, ไม่ต้องมีเอฟเฟคต์แต่งเติมใดๆ (NO digital effects) จัดแสงให้ออกมาเหมือนครีเอเตอร์รีวิวสินค้าเอง (Natural daily lighting, Creator POV, UGC style) และ "ห้ามจัดแสงสีระดับ Studio สวยเกินจริงเด็ดขาด!" (Strictly NO studio lighting)
    {video_voice_instruction}
 7. **Task 1 (ข้อมูล JSON อย่างเดียว):** ส่งโครงสร้างบทวิเคราะห์ทั้งหมดมาเป็นดค้ด JSON อย่างเดียวโดยยึดตามโครงสร้างที่กำหนด (ไม่ต้องพยายามสร้างภาพกราฟิก)
 8. **คำสั่งสำคัญเรื่องการตลาด:** หน้าที่ของคุณคือการเป็น Content Creator และนักการตลาดเชี่ยวชาญด้าน Affiliate Marketing บน TikTok โปรดดูภาพสินค้าที่ฉันแนบมานี้ และวิเคราะห์จุดขายเพื่อร่างข้อความโพสต์ใส่ลงใน `tiktok_post_data` ดังนี้
