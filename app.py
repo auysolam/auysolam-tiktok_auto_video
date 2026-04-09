@@ -218,38 +218,24 @@ st.markdown("---")
 st.subheader("📸 1. เริ่มต้นใหม่: อัปโหลดรูปภาพสินค้า")
 
 # ส่วนอัปโหลดภาพสินค้า
-col1, col2 = st.columns(2)
-with col1:
-    product_info_file = st.file_uploader("📝 1. อัปโหลดรูปเพื่อใช้ดึงข้อมูล", type=['jpg', 'jpeg', 'png', 'webp'])
-with col2:
-    flow_ref_file = st.file_uploader("🖼️ 2. อัปโหลดรูปสำหรับแนบใน Flow", type=['jpg', 'jpeg', 'png', 'webp'])
+uploaded_file = st.file_uploader("📸 อัปโหลดรูปภาพสินค้า (หน้าตรง เห็นชัดเจน)", type=['png', 'jpg', 'jpeg', 'webp'])
 
-if product_info_file and flow_ref_file:
+if uploaded_file:
     if True:
-        st.write("✅ อัปโหลดรูปภาพครบทั้ง 2 ส่วนแล้ว")
-        image_paths = []
+        # แปลงและลดขนาดภาพ ป้องกัน Token ล้น และบีบอัดเป็น RGB
+        img = Image.open(uploaded_file)
+        rgb_im = img.convert('RGB')
+        rgb_im.thumbnail((1080, 1920), Image.Resampling.LANCZOS)
         
-        # รูปที่ 1: สำหรับ Gemini วิเคราะห์
-        img_info = Image.open(product_info_file)
-        rgb_info = img_info.convert('RGB')
-        rgb_info.thumbnail((1080, 1920), Image.Resampling.LANCZOS)
-        info_path = "assets/input/product_info.jpg"
-        rgb_info.save(info_path, format="JPEG", quality=95)
-        image_paths.append(info_path)
+        # Save for Gemini
+        image_path = "assets/input/sample_product.jpg"
+        rgb_im.save(image_path, format="JPEG", quality=95)
         
-        # รูปที่ 2: สำหรับแนบใน Flow
-        img_ref = Image.open(flow_ref_file)
-        rgb_ref = img_ref.convert('RGB')
-        rgb_ref.thumbnail((1080, 1920), Image.Resampling.LANCZOS)
-        ref_path = "assets/input/app_uploaded_product_0.jpg"
-        rgb_ref.save(ref_path, format="JPEG", quality=95)
-        image_paths.append(ref_path)
+        col_img1, col_img2 = st.columns([1, 2])
+        col_img1.image(img, caption="ตัวอย่างรูปภาพต้นฉบับ", use_container_width=True)
         
-        col_img1, col_img2 = st.columns(2)
-        col_img1.image(img_info, caption="รูปสำหรับดึงข้อมูลสินค้า", use_container_width=True)
-        col_img2.image(img_ref, caption="รูปสำหรับแนบใน Flow", use_container_width=True)
-            
-        st.markdown("---")
+        # เราใช้แค่ภาพเดียวสำหรับวิเคราะห์ ส่งใส่ list ไว้เหมือนเดิมให้โค้ดข้างล่างทำงานต่อได้
+        image_paths = [image_path]
         
         st.markdown("---")
         
