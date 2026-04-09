@@ -594,11 +594,10 @@ if st.session_state.video_plan_json:
     except Exception as e:
         st.error(f"ข้อผิดพลาดระหว่างแสดงผลสคริปต์: {e}")
         
-st.markdown("---")
-st.subheader("📝 ข้อมูลสำหรับโพสต์ TikTok (Caption & Hashtags)")
-st.write("ระบบจะดึงข้อมูลแคปชั่นและแฮชแท็กมาให้โดยอัตโนมัติ จากโค้ด JSON ที่คุณวาง")
-
 if st.session_state.video_plan_json:
+    st.markdown("---")
+    st.subheader("📝 ข้อมูลสำหรับโพสต์ TikTok (Caption & Hashtags)")
+    st.write("ข้อมูลแคปชั่นและโควตสำหรับวิดีโอถูกสร้างขึ้นเรียบร้อยแล้ว!")
     try:
         import json
         video_plan_data = json.loads(st.session_state.video_plan_json)
@@ -624,8 +623,6 @@ if st.session_state.video_plan_json:
                 st.markdown("### 📌 4. สรุปจุดเด่นสินค้า (สำหรับใช้อ้างอิง)")
                 st.code(post_data.get('product_details', ''), language="text")
         else:
-            st.warning("⚠️ ไม่พบข้อมูลแคปชั่นและแฮชแท็กในโค้ด JSON กรุณากลับไปเช็ค Gemini หรือลองกดสร้างโค้ดใหม่อีกครั้งครับ")
+            st.warning("⚠️ ไม่พบข้อมูลแคปชั่นและแฮชแท็กในประวัติ กรุณาลองสร้างใหม่อีกครั้งครับ")
     except Exception as e:
         st.error(f"❌ เกิดข้อผิดพลาดในการวิเคราะห์ข้อมูลแคปชั่น: {e}")
-else:
-    st.info("👈 เมื่อคุณนำโค้ด JSON วางในช่องรับข้อมูลด้านบนเสร็จแล้ว ข้อมูลโพสต์ทั้งหมดจะเด้งขึ้นมาตรงนี้ทันทีครับ!")
