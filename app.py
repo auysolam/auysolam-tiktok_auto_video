@@ -427,6 +427,8 @@ if uploaded_file:
                                 script_instruction = '3. **ห้ามแต่งบทพูดเด็ดขาด (No Voiceover)** ให้ปล่อยฟิลด์ script ว่างไว้ หรือเขียนเพียงแค่ "[ดนตรีบรรเลงเร้าใจ]"'
                                 video_voice_instruction = '- **Focus video prompt:** "Cinematic visual storytelling, natural aesthetic"'
 
+                    consistent_char_phrase = "" if no_char_mode else "EXACT SAME character in every scene, STRICTLY IDENTICAL face, hair, and clothing, perfectly consistent character identity, "
+
                     if no_char_mode or "คนจริง" in char_style:
                         image_style_instruction = '   - **สไตล์ภาพถ่ายสุดเรียล:** ให้ระบุใน prompt ว่า "Realistic smartphone lifestyle photo, clear background depth, sharp focus on subject." เพื่อให้ภาพดูสมจริง'
                         video_style_instruction = '   - **สไตล์เรียลๆ:** บังคับเพิ่ม "Realistic lifestyle footage, normal real-time speed, perfectly sharp background, cinematic composition, crisp focus" เสมอ'
@@ -454,9 +456,9 @@ if uploaded_file:
 {f"4. **ไม่ต้องเขียนบทพากย์** แต่ละซีนมีความยาว {scene_duration} วินาที" if no_voiceover else f"4. เขียนบทพากย์ให้สามารถพูดจบได้ภายใน {scene_duration} วินาทีต่อซีน"}
 5. เขียน image_prompt เป็นภาษาอังกฤษ เพื่อใช้ **เจนภาพนิ่งด้วย Gemini (Imagen 3)**
    - **สำคัญมาก (การติดป้ายชื่อซีน):** บังคับให้คุณขึ้นต้นประโยคแรกของ `image_prompt` ทุกซีนด้วยคำว่า "Scene 1: ", "Scene 2: " ... ตามลำดับซีนเสมอ (เช่น "Scene 1: Vertical 9:16 aspect ratio...")
-   - บังคับให้ใส่: "Vertical 9:16 aspect ratio, NO text overlays, NO typography, ONLY one single distinct scene, NO 4-panel grid, NO split screen"
+   - บังคับให้ใส่: "Vertical 9:16 aspect ratio, {consistent_char_phrase}NO text overlays, NO typography, ONLY one single distinct scene, NO 4-panel grid, NO split screen"
    - **กฎการแยกภาพ (No Grid/Collage):** ห้ามให้ AI เจนภาพ 4 ซีนรวมอยู่ในรูปเดียว (กากบาท/ตาราง 4 ช่อง) อย่างเด็ดขาด! บังคับเขียนสั่งท้าย prompt ว่า "Single full frame, absolutely NO multi-panel collage"
-   - **กฎการล็อกเป้า 100% (CRITICAL UNIFIED CORE_PROMPT):** คุณต้องรวบรวมรายละเอียดทั้งหมด ได้แก่ 1) หน้าตาและสรีระของตัวละคร (สีผม ทรงผม ชุดที่ใส่) 2) ลักษณะของรูปภาพสินค้า (อักษร ลายพิมพ์ สี) แบบละเอียดโคตรๆ และ 3) ฉากหลังที่เจาะจงมาก (เช่น A specific modern kitchen) 
+   - **กฎการล็อกเป้า 100% (CRITICAL UNIFIED CORE_PROMPT):** คุณต้องรวบรวมรายละเอียดทั้งหมด ได้แก่ 1) การตั้งชื่อและสรีระรูปลักษณ์แบบเจาะจง (เช่น "A 25yo Thai woman named Mali with short black bob hair wearing a white t-shirt") เพื่อใช้เป็นกุญแจล็อคหน้าตาและชุดให้เหมือนเดิมทุกรูขุมขน 2) ลักษณะของรูปภาพสินค้า (อักษร ลายพิมพ์ สี) แบบละเอียดโคตรๆ และ 3) ฉากหลังที่เจาะจงมาก (เช่น A specific modern kitchen) 
    - นำข้อมูลทั้ง 3 ข้อด้านบนมาแต่งรวมกันเป็น 1 ย่อหน้า เรียกว่า `[CORE_PROMPT]` และ **คุณมีหน้าที่เรียงลำดับดังนี้: ขึั้นต้นด้วย "Scene X: " เป็นคำแรกสุด จากนั้นเว้นวรรคและตามด้วย `[CORE_PROMPT]` เป็นย่อหน้าแรกสุดใน `image_prompt` ของทุกๆ ซีนย่อย ห้ามตกหล่นแม้แต่ตัวอักษรเดียว! (ห้ามเอาอะไรมาบังหน้าคำว่า Scene X: เด็ดขาด)**
    - ส่วนที่เปลี่ยนได้ในแต่ละซีน คือแค่ "ท่าทางโพส (Pose)" และ "มุมกล้อง (Camera Angle)" ต่อท้าย `[CORE_PROMPT]` เท่านั้น! เพื่อบังคับให้ AI สร้างภาพ นางแบบเดิม ฉากเดิม สินค้าเดิม ตลอดทั้งคลิป!
    - **กฎเหล็กเพื่อความชัด (ห้ามเบลอฉากหลังเด็ดขาด):** บังคับให้ทุกประโยค `image_prompt` จบด้วยคำสั่งนี้เสมอ: "Taken with an ordinary smartphone camera, zero portrait mode. The background environment MUST BE 100% crystal clear and fully visible in sharp focus. Extreme deep depth of field, absolutely NO bokeh, NO background blur at all, perfectly sharp scenery background. Correct anatomical hands."
