@@ -249,9 +249,7 @@ if uploaded_file:
                 product_only_mode = st.checkbox("📦 โหมดโชว์เฉพาะสินค้า (ไม่เอาคน/เน้นมุมกล้อง)", value=False)
                 fashion_mode = st.checkbox("👗 โหมดแฟชั่นเสื้อผ้า (เน้นตัวละครสวมใส่)", value=False, disabled=product_only_mode)
                 
-                no_voiceover = False
-                if product_only_mode or fashion_mode:
-                    no_voiceover = st.checkbox("🚫 ไม่เอาบทพูด (เน้นดนตรีประกอบอย่างเดียว)", value=False)
+                no_voiceover = st.checkbox("🚫 ไม่เอาบทพูด (เน้นดนตรีประกอบอย่างเดียว)", value=False)
 
                 char_options = [
                     "สาวไทย (วัยรุ่น)", "หนุ่มไทย (วัยรุ่น)", "สาวไทย (วัยทำงาน)", "หนุ่มไทย (วัยทำงาน)",
@@ -421,9 +419,13 @@ if uploaded_file:
                     else:
                         char_rule = f"- ตัวละครหลัก: {char_type}\\n- สีผิว: {char_skin}\\n- บุคลิกภาพ/รูปร่าง: {traits_str}\\n- **กฎตัวละครและสินค้า (CRITICAL CHARACTER & PRODUCT):** สำหรับ 'ตัวละคร/บุคคล' ในรูป ให้สร้างหน้าตาคนขึ้นมาใหม่ทั้งหมด ห้ามก๊อปปี้หน้าตาคนจากรูปอ้างอิงเด็ดขาด! แต่สำหรับ 'ตัวสินค้า' ต้องเหมือนรูปที่แนบมาเป๊ะๆ 100% (ให้เหมือนตัดแปะตัวสินค้าจากรูปจริง) โดยคุณต้องเขียน `image_prompt` กำชับ AI ให้ชัดเจนว่า 'A completely NEW character person, but the product is EXACTLY identical to the reference image, perfect match.' และต้องบรรยายรายละเอียดสินค้าอย่างถี่ยิบ\\n"
                         scene_rule = f"2. ซีนที่ 1 บังคับให้เป็นภาพตัวละครครึ่งตัว (Half-body) หรือเต็มตัวเดิน (Full-body walking) ห้ามโฟกัสสินค้าใกล้เกินไป ส่วนซีนอื่นๆ ต้องมีฉากที่เจาะจงนำเสนอ 'ตัวสินค้าชัดๆ (Product Shot)' จำนวน {product_scene_count} ซีน และที่เหลือให้เป็น 'ฉากเล่าเรื่อง/ไลฟ์สไตล์ (Story/Lifestyle)' ที่มีตัวละครหลัก"
-                        if no_voiceover and no_bgm: # Edge case general mode without voice and bgm
-                            script_instruction = '3. **ห้ามแต่งบทพูดและซาวด์เด็ดขาด** ให้ปล่อยฟิลด์ script ว่างไว้'
-                            video_voice_instruction = '- **Focus video prompt:** "Silent visual focus, natural aesthetic"'
+                        if no_voiceover:
+                            if no_bgm:
+                                script_instruction = '3. **ห้ามแต่งบทพูดและซาวด์เด็ดขาด** ให้ปล่อยฟิลด์ script ว่างไว้'
+                                video_voice_instruction = '- **Focus video prompt:** "Silent visual focus, natural aesthetic"'
+                            else:
+                                script_instruction = '3. **ห้ามแต่งบทพูดเด็ดขาด (No Voiceover)** ให้ปล่อยฟิลด์ script ว่างไว้ หรือเขียนเพียงแค่ "[ดนตรีบรรเลงเร้าใจ]"'
+                                video_voice_instruction = '- **Focus video prompt:** "Cinematic visual storytelling, natural aesthetic"'
 
                     if no_char_mode or "คนจริง" in char_style:
                         image_style_instruction = '   - **สไตล์ภาพถ่ายสุดเรียล:** ให้ระบุใน prompt ว่า "Realistic smartphone lifestyle photo, clear background depth, sharp focus on subject." เพื่อให้ภาพดูสมจริง'
@@ -449,7 +451,7 @@ if uploaded_file:
 1. ต้องสร้างซีนให้ได้จำนวน {num_scenes} ซีน เป๊ะๆ
 {scene_rule}
 {script_instruction}
-4. เขียนบทพากย์ให้สามารถพูดจบได้ภายใน {scene_duration} วินาทีต่อซีน 
+{f"4. **ไม่ต้องเขียนบทพากย์** แต่ละซีนมีความยาว {scene_duration} วินาที" if no_voiceover else f"4. เขียนบทพากย์ให้สามารถพูดจบได้ภายใน {scene_duration} วินาทีต่อซีน"}
 5. เขียน image_prompt เป็นภาษาอังกฤษ เพื่อใช้ **เจนภาพนิ่งด้วย Gemini (Imagen 3)**
    - **สำคัญมาก (การติดป้ายชื่อซีน):** บังคับให้คุณขึ้นต้นประโยคแรกของ `image_prompt` ทุกซีนด้วยคำว่า "Scene 1: ", "Scene 2: " ... ตามลำดับซีนเสมอ (เช่น "Scene 1: Vertical 9:16 aspect ratio...")
    - บังคับให้ใส่: "Vertical 9:16 aspect ratio, NO text overlays, NO typography, ONLY one single distinct scene, NO 4-panel grid, NO split screen"
