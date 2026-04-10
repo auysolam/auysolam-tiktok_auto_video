@@ -248,6 +248,7 @@ if uploaded_file:
             with st.expander("👤 2.1 - 2.4 ตั้งค่าตัวละครหลัก", expanded=True):
                 product_only_mode = st.checkbox("📦 โหมดโชว์เฉพาะสินค้า (ไม่เอาคน/เน้นมุมกล้อง)", value=False)
                 fashion_mode = st.checkbox("👗 โหมดแฟชั่นเสื้อผ้า (เน้นตัวละครสวมใส่)", value=False, disabled=product_only_mode)
+                seller_mode = st.checkbox("🎙️ โหมดแม่ค้าไลฟ์ขายเสื้อผ้า (รีวิวไม้แขวน/หุ่นโชว์)", value=False, disabled=product_only_mode)
                 
                 no_voiceover = st.checkbox("🚫 ไม่เอาบทพูด (เน้นดนตรีประกอบอย่างเดียว)", value=False)
 
@@ -260,7 +261,7 @@ if uploaded_file:
                     "คู่รัก", "สุนัข", "แมว", "อื่นๆ"
                 ]
 
-                if fashion_mode:
+                if fashion_mode or seller_mode:
                     fashion_item_type = st.selectbox("👗 2.1.2 ประเภทสินค้าแฟชั่น", ["เสื้อ (Tops)", "กางเกง/กระโปรง (Bottoms)", "ชุดเดรส/ชุดเซท (Dress/Sets)", "กระเป๋า (Bags)", "รองเท้า (Shoes)", "หมวก/เครื่องประดับ (Accessories)", "อื่นๆ"])
                     if fashion_item_type == "อื่นๆ":
                         fashion_item_type = st.text_input("ระบุประเภทสินค้าแฟชั่นอื่นๆ:")
@@ -416,6 +417,23 @@ if uploaded_file:
                                 video_voice_instruction = '- **Focus video prompt:** "Cinematic visual storytelling"' + fashion_motion_instruction
                         else:
                             video_voice_instruction += fashion_motion_instruction
+                    elif seller_mode:
+                        char_rule = f"- โหมดบรรยากาศร้านขายเสื้อผ้า (สินค้า: {fashion_item_type}): เน้นฉากในร้านขายเสื้อผ้าที่ตกแต่งเข้ากับประเภทสินค้า ฉากหลังต้องชัดเจนกว้างขวางเห็นบรรยากาศร้าน (Absolutely NO background blur, deep depth of field)\\n- ตัวละครหลักพ่อค้า/แม่ค้า: {char_type} ซึ่งแต่งกายด้วยสไตล์ที่เข้ากับสินค้า\\n- สีผิว: {char_skin}\\n- บุคลิกภาพ: {traits_str}\\n- **กฎตัวละครและสินค้า (CRITICAL CHARACTER & PRODUCT):** สร้างหน้าตาคนใหม่หมด แต่ 'ตัวสินค้า' ต้องเหมือนรูปเป๊ะๆ 100% ตัวละครนำเสนอสินค้าแบบแม่ค้าออนไลน์ โดยถือสินค้าบนไม้แขวนเสื้อ และโชว์สินค้าบนหุ่นโชว์เสื้อผ้า (Mannequin) ตั้งอยู่ 2 ตัว (ตัวหนึ่งสวมโชว์ด้านหน้า และอีกตัวสวมโชว์ด้านหลัง)\\n"
+                        scene_rule = f"2. การจัดลำดับภาพแต่ละซีน:\\n   - ซีนช็อตที่ 1: ตัวละครยืนอยู่ในร้านขายเสื้อผ้า ถือไม้แขวนเสื้อที่มีสินค้านี้แขวนอยู่เพื่อนำเสนอด้วยความมั่นใจ\\n   - ซีนช็อตที่ 2: โฟกัสไปที่หุ่นโชว์เสื้อผ้า (Mannequin) 2 ตัว โชว์ด้านหน้าและด้านหลังของสินค้าชัดเจน\\n   - ซีนช็อตที่ 3: โฟกัสจับใกล้ดีเทลผืนผ้าขณะที่ตัวละครกำลังชี้หรือจับสินค้า\\n   - ซีนช็อตที่ 4: แพนกล้องให้เห็นตัวละครยืนคู่กับหุ่นโชว์เสื้อผ้า พร้อมยิ้มแย้มรีวิวเชียร์ขายสินค้า\\n"
+                        
+                        seller_motion_instruction = f'\\n   - **ท่าทางการเคลื่อนไหวภาพ:** ขยับแบบนักขายกำลังรีวิวสินค้า "Natural energetic seller movement, reviewing product details, real-time speed, crisp focus"'
+                        
+                        if no_voiceover:
+                            char_rule += "- **ย้ำ: ไม่ต้องคิดบทพูด (Voiceover) เด็ดขาด**\\n"
+                            if no_bgm:
+                                script_instruction = '3. **ห้ามแต่งบทพูดและซาวด์เด็ดขาด** ให้ปล่อยฟิลด์ script ว่างไว้'
+                                video_voice_instruction = '- **Focus video prompt:** "Silent seller visual focus, showing products on hangers and mannequins"' + seller_motion_instruction
+                            else:
+                                script_instruction = '3. **ห้ามแต่งบทพูดเด็ดขาด (No Voiceover)** ให้ปล่อยฟิลด์ script ว่างไว้ หรือเขียนเพียงแค่ "[ดนตรีประกอบสนุกสนาน]"'
+                                video_voice_instruction = '- **Focus video prompt:** "Energetic seller presenting products visually"' + seller_motion_instruction
+                        else:
+                            script_instruction = '3. คิดบทพากย์ (script) โดยใช้ **"เสียงและอารมณ์แนวนักขาย (Hard Sell/Energetic Seller)"** แนะนำสินค้า เชียร์ขาย บอกโปรโมชั่น และกระตุ้นให้กดตะกร้าซื้ออย่างกระตือรือร้น'
+                            video_voice_instruction = seller_motion_instruction
                     else:
                         char_rule = f"- ตัวละครหลัก: {char_type}\\n- สีผิว: {char_skin}\\n- บุคลิกภาพ/รูปร่าง: {traits_str}\\n- **กฎตัวละครและสินค้า (CRITICAL CHARACTER & PRODUCT):** สำหรับ 'ตัวละคร/บุคคล' ในรูป ให้สร้างหน้าตาคนขึ้นมาใหม่ทั้งหมด ห้ามก๊อปปี้หน้าตาคนจากรูปอ้างอิงเด็ดขาด! แต่สำหรับ 'ตัวสินค้า' ต้องเหมือนรูปที่แนบมาเป๊ะๆ 100% (ให้เหมือนตัดแปะตัวสินค้าจากรูปจริง) โดยคุณต้องเขียน `image_prompt` กำชับ AI ให้ชัดเจนว่า 'A completely NEW character person, but the product is EXACTLY identical to the reference image, perfect match.' และต้องบรรยายรายละเอียดสินค้าอย่างถี่ยิบ\\n"
                         scene_rule = f"2. ซีนที่ 1 บังคับให้เป็นภาพตัวละครครึ่งตัว (Half-body) หรือเต็มตัวเดิน (Full-body walking) ห้ามโฟกัสสินค้าใกล้เกินไป ส่วนซีนอื่นๆ ต้องมีฉากที่เจาะจงนำเสนอ 'ตัวสินค้าชัดๆ (Product Shot)' จำนวน {product_scene_count} ซีน และที่เหลือให้เป็น 'ฉากเล่าเรื่อง/ไลฟ์สไตล์ (Story/Lifestyle)' ที่มีตัวละครหลัก"
