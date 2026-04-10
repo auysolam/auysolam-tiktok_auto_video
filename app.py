@@ -363,7 +363,7 @@ if uploaded_file:
                     st.error("⚠️ กรุณาใส่ Gemini API Key ในแผงตั้งค่าระบบด้านบนก่อนครับ!")
                 else:
                     script_instruction = '3. คิดบทพากย์ (script) ที่ดึงดูด น่าสนใจ เป็นเรื่องราวเนื้อหาต่อเนื่องกันแบบเนียนๆ ตั้งแต่ซีนแรกจนถึงซีนสุดท้าย (ห้ามตัดจบดื้อๆ) และสอดคล้องกับ "เสียงผู้พากย์" และ "อารมณ์น้ำเสียง" อย่างเคร่งครัด'
-                    video_voice_instruction = f'- **ความเนียนระดับ Extend:** บังคับสั่งให้เสียงและภาพต่อกันเนียนที่สุดตั้งแต่ซีน 1 ยันซีนสุดท้าย ใส่คำสั่งว่า "Continuous seamless extension from previous scene, EXACTLY the same character, same environment. Include synchronized voiceover narration in {voice_type} voice with {voice_emotion} tone, EXACTLY the same voice identity across all clips"'
+                    video_voice_instruction = f'- **การรักษาความต่อเนื่อง:** บังคับให้ใส่ "Continuous motion from previous shot, exact same subject and natural environment." (Flow/Veo ไม่รองรับการสั่งให้มีเสียงคนพูด (Voiceover) ในพรอมต์ หากใส่ไป AI จะค้างที่ 99% ให้โฟกัสแค่ภาพและ Sound Effect หรือบรรยากาศ)'
                     
                     if no_char_mode:
                         char_rule = f"- เป็นวิดีโอโชว์สินค้าเพียวๆ ไม่มีคนหรือสัตว์ในภาพเลย (100% Product B-Roll)\\n- เน้นดนตรีประกอบน่าตื่นเต้น ตัดต่อเร้าใจ\\n"
@@ -372,10 +372,10 @@ if uploaded_file:
                             char_rule += "- **ย้ำ: ไม่ต้องคิดบทพูด (Voiceover) เด็ดขาด**\\n"
                             if no_bgm:
                                 script_instruction = '3. **ห้ามแต่งบทพูดและซาวด์เด็ดขาด** ให้ปล่อยฟิลด์ script ว่างไว้'
-                                video_voice_instruction = '- **ข้อบังคับเรื่องเสียง:** กำชับไว้ใน Video Prompt เสมอว่า "NO voiceover, NO dialogue, NO background music, perfectly silent, RAW footage"'
+                                video_voice_instruction = '- **Focus video prompt:** "Cinematic silent product b-roll, pure visual focus"'
                             else:
                                 script_instruction = '3. **ห้ามแต่งบทพูดเด็ดขาด (No Voiceover)** ให้ปล่อยฟิลด์ script ว่างไว้ หรือเขียนเพียงแค่ "[ดนตรีบรรเลงเร้าใจ]"'
-                                video_voice_instruction = '- **ข้อบังคับเรื่องเสียง:** กำชับไว้ใน Video Prompt เสมอว่า "NO voiceover, NO dialogue, ONLY energetic background music and cinematic sound effects"'
+                                video_voice_instruction = '- **Focus video prompt:** "Cinematic product b-roll with energetic background feeling"'
                     elif fashion_mode:
                         # แยกประเภทสินค้าเพื่อกำหนดฉากเจาะจง
                         if "เสื้อ" in fashion_item_type:
@@ -406,16 +406,16 @@ if uploaded_file:
    - ซีนช็อตที่ 4: **{pan_target}** อย่างชัดเจน
    (หากมีมากกว่า 4 ซีน ให้สลับหมุนเวียนให้เป็นธรรมชาติ)"""
                         
-                        fashion_motion_instruction = f'\\n   - **ท่าทางการเคลื่อนไหวภาพ:** บังคับให้สร้างแอนิเมชันความเร็วปกติ ขยับแบบมนุษย์ทั่วไป "Natural everyday human movement, completely normal real-time speed, NO slow-mo, absolutely NO visual effects, RAW authentic smartphone footage, deep depth of field, NO bokeh"'
+                        fashion_motion_instruction = f'\\n   - **ท่าทางการเคลื่อนไหวภาพ:** บังคับให้สร้างแอนิเมชันความเร็วปกติ ขยับแบบมนุษย์ทั่วไป "Natural everyday human movement, real-time speed, cinematic lighting, crisp focus"'
                         
                         if no_voiceover:
                             char_rule += "- **ย้ำ: ไม่ต้องคิดบทพูด (Voiceover) เด็ดขาด**\\n"
                             if no_bgm:
                                 script_instruction = '3. **ห้ามแต่งบทพูดและซาวด์เด็ดขาด** ให้ปล่อยฟิลด์ script ว่างไว้'
-                                video_voice_instruction = '- **ข้อบังคับเรื่องเสียง:** กำชับไว้ใน Video Prompt เสมอว่า "NO voiceover, NO dialogue, NO background music, perfectly silent, RAW footage"' + fashion_motion_instruction
+                                video_voice_instruction = '- **Focus video prompt:** "Silent visual focus, natural feeling"' + fashion_motion_instruction
                             else:
                                 script_instruction = '3. **ห้ามแต่งบทพูดเด็ดขาด (No Voiceover)** ให้ปล่อยฟิลด์ script ว่างไว้ หรือเขียนเพียงแค่ "[ดนตรีบรรเลงเร้าใจ]"'
-                                video_voice_instruction = '- **ข้อบังคับเรื่องเสียง:** กำชับไว้ใน Video Prompt เสมอว่า "NO voiceover, NO dialogue, ONLY energetic background music and cinematic sound effects"' + fashion_motion_instruction
+                                video_voice_instruction = '- **Focus video prompt:** "Cinematic visual storytelling"' + fashion_motion_instruction
                         else:
                             video_voice_instruction += fashion_motion_instruction
                     else:
@@ -423,17 +423,17 @@ if uploaded_file:
                         scene_rule = f"2. ซีนที่ 1 บังคับให้เป็นภาพตัวละครครึ่งตัว (Half-body) หรือเต็มตัวเดิน (Full-body walking) ห้ามโฟกัสสินค้าใกล้เกินไป ส่วนซีนอื่นๆ ต้องมีฉากที่เจาะจงนำเสนอ 'ตัวสินค้าชัดๆ (Product Shot)' จำนวน {product_scene_count} ซีน และที่เหลือให้เป็น 'ฉากเล่าเรื่อง/ไลฟ์สไตล์ (Story/Lifestyle)' ที่มีตัวละครหลัก"
                         if no_voiceover and no_bgm: # Edge case general mode without voice and bgm
                             script_instruction = '3. **ห้ามแต่งบทพูดและซาวด์เด็ดขาด** ให้ปล่อยฟิลด์ script ว่างไว้'
-                            video_voice_instruction = '- **ข้อบังคับเรื่องเสียง:** กำชับไว้ใน Video Prompt เสมอว่า "NO voiceover, NO dialogue, NO background music, perfectly silent, RAW footage"'
+                            video_voice_instruction = '- **Focus video prompt:** "Silent visual focus, natural aesthetic"'
 
                     if no_char_mode or "คนจริง" in char_style:
-                        image_style_instruction = '   - **สไตล์ภาพถ่ายสุดเรียล (ห้ามเบลอฉากหลัง):** ให้ระบุใน prompt เสมอว่า "Ultra-realistic raw smartphone photo, extreme deep depth of field, everything in absolute focus. The background environment MUST BE EXTREMELY SHARP AND CLEAR. Absolutely NO bokeh, NO background blur at all." เพื่อให้ภาพดูเรียลเหมือนปิดโหมด Portrait'
-                        video_style_instruction = '   - **สไตล์เรียลๆ (ความเร็วปกติ ห้ามสโลว์โมชั่น / ห้ามเบลอฉากหลัง):** บังคับเพิ่ม "Ultra-realistic raw smartphone footage, authentic daily life snapshot, normal real-time speed, absolutely NO slow motion, extreme deep depth of field, everything in absolute focus, NO bokeh, completely sharp background, absolutely NO blurry background" เสมอ'
+                        image_style_instruction = '   - **สไตล์ภาพถ่ายสุดเรียล:** ให้ระบุใน prompt ว่า "Realistic smartphone lifestyle photo, clear background depth, sharp focus on subject." เพื่อให้ภาพดูสมจริง'
+                        video_style_instruction = '   - **สไตล์เรียลๆ:** บังคับเพิ่ม "Realistic lifestyle footage, normal real-time speed, perfectly sharp background, cinematic composition, crisp focus" เสมอ'
                     elif "การ์ตูน 2D" in char_style:
-                        image_style_instruction = '   - **สไตล์ภาพการ์ตูน 2D:** ให้กำหนดสไตล์ภาพเป็น "High quality 2D Anime style, vibrant colors, flat shading, Ghibli style background, completely sharp focus, NO bokeh" และ "ห้ามทำหน้าชัดหลังเบลอเด็ดขาด"'
-                        video_style_instruction = '   - **สไตล์วิดีโอการ์ตูน 2D (ความเร็วปกติ ห้ามสโลว์โมชั่น):** บังคับเพิ่ม "High quality 2D Anime animation, vibrant colors, flat shading, Ghibli style, normal real-time speed, absolutely NO slow motion, extremely sharp focus, NO bokeh, completely sharp background, NO blurry background" เสมอ'
+                        image_style_instruction = '   - **สไตล์ภาพการ์ตูน 2D:** ให้กำหนดสไตล์ภาพเป็น "High quality 2D Anime style, vibrant colors, flat shading, Ghibli style background, sharp focus"'
+                        video_style_instruction = '   - **สไตล์วิดีโอการ์ตูน 2D:** บังคับเพิ่ม "High quality 2D Anime animation, vibrant colors, flat shading, Ghibli style, normal real-time speed, sharp background" เสมอ'
                     else: # อวตาร 3D
-                        image_style_instruction = '   - **สไตล์ภาพอวตาร 3D:** ให้กำหนดสไตล์ภาพเป็น "High quality 3D Pixar style, cute 3D character, vibrant lighting, highly detailed 3D render, completely sharp focus, NO bokeh" และ "ห้ามทำหน้าชัดหลังเบลอเด็ดขาด"'
-                        video_style_instruction = '   - **สไตล์วิดีโออวตาร 3D (ความเร็วปกติ ห้ามสโลว์โมชั่น):** บังคับเพิ่ม "High quality 3D Pixar style animation, highly detailed 3D render, normal real-time speed, absolutely NO slow motion, extremely sharp focus, NO bokeh, completely sharp background, NO blurry background" เสมอ'
+                        image_style_instruction = '   - **สไตล์ภาพอวตาร 3D:** ให้กำหนดสไตล์ภาพเป็น "High quality 3D Pixar style, cute 3D character, vibrant lighting, highly detailed 3D render, sharp focus"'
+                        video_style_instruction = '   - **สไตล์วิดีโออวตาร 3D:** บังคับเพิ่ม "High quality 3D Pixar style animation, highly detailed 3D render, normal real-time speed, sharp background" เสมอ'
 
                     master_prompt = f"""คุณคือผู้เชี่ยวชาญด้านการทำวิดีโอสั้น (TikTok/Reels) สำหรับ Affiliate Marketing หรือขายของออนไลน์
 งานของคุณคือวิเคราะห์ 'ภาพสินค้า' ที่ฉันแนบมานี้ และสร้างแผนการทำวิดีโอ (Video Plan) จำนวน {num_scenes} ซีน
@@ -462,11 +462,11 @@ if uploaded_file:
    - บรรยายแสงเงา บรรยากาศ มุมกล้อง ให้เป็นแบบ "แสงธรรมชาติทั่วไป (Natural daily lighting)" ห้ามจัดแสงสวยหรูแบบสตูดิโอเด็ดขาด และห้ามสั่งให้วาดป้ายราคาหรือข้อความทับลงไปในภาพเด็ดขาด
 6. เขียน video_prompt เป็นภาษาอังกฤษ สำหรับ **เจนวนิเมชัน+เสียง บน Google Labs Flow**
 {video_style_instruction}
-   - **สำคัญมาก (การติดป้ายชื่อซีน):** บังคับให้คุณขึ้นต้นประโยคของ `video_prompt` ทุกซีนด้วยคำว่า "Scene 1: ", "Scene 2: " ... ตามลำดับซีนเสมอ เช่นเดียวกับภาพนิ่ง
-   - **กฎความเร็วปกติ (SUPER CRITICAL NO SLOW MOTION):** ห้ามสร้าง Prompt ที่ทำให้เกิดภาพช้าเด็ดขาด! บังคับให้คุณต้องเติมคำสั่งนี้ลงไปในประโยคของ `video_prompt` ทุกซีนเสมอ: "1.0x normal everyday real-time speed, absolutely NO slow motion whatsoever"
-   - **กฎการพาแพนกล้อง (มุมด้านหลัง):** หากไม่มีความจำเป็น ให้หลีกเลี่ยงการเขียน Prompt สั่งแพนกล้องไปข้างหลัง ให้เน้นขยับกล้องเฉพาะด้านหน้า (Front view only) แต่ถ้าจำเป็นต้องเห็นด้านหลัง บังคับเขียนคำสั่งเพิ่มว่า "Back design is exactly identical to the front pattern" เพื่อไม่ให้ AI มโนลวดลายประหลาดๆ ขึ้นมาเอง
-   - **ความต่อเนื่องแบบ Extend เนียนๆ:** ตั้งแต่ซีน 2 เป็นต้นไป ให้บังคับสั่ง "Continuous seamless extension from the exact previous frame, exact same subject, exact same environment, no cuts, perfectly smooth transition"
-   - การขยับ: เน้นสั่งเฉพาะ 'Camera motion' และ 'Subject motion' รวบกับ "NO text overlays" อย่างกระชับ, ไม่ต้องมีเอฟเฟคต์แต่งเติมใดๆ (NO digital effects) จัดแสงให้ออกมาเหมือนครีเอเตอร์รีวิวสินค้าเอง (Natural daily lighting, Creator POV, UGC style) และ "ห้ามจัดแสงสีระดับ Studio สวยเกินจริงเด็ดขาด!" (Strictly NO studio lighting)
+   - ไม่ต้องขึ้นต้นด้วย "Scene X:" ใน `video_prompt` เพราะอาจทำให้ Flow ค้าง ให้เขียนคำสั่งภาพไปเลยตรงๆ
+   - **ความเร็วและมุมกล้อง:** ให้ย้ำว่า "Normal speed cinematic camera motion." เน้นขยับกล้องเฉพาะด้านหน้า (Front view only) 
+   - **หลีกเลี่ยงการใช้คำปฏิเสธเยอะๆ เช่น NO NO NO** เพราะจะทำให้ AI Model บล็อกคำสั่ง ให้เขียนบรรยายสิ่งที่ต้องการเห็นแทน เช่น "Clear footage, perfectly sharp" 
+   - **ห้ามสั่ง AI ให้พากย์เสียงคนพูดเด็ดขาด (No voiceover requests in prompt)** เพราะเป็นข้อห้ามของระบบ Video AI และจะค้าง 99% ให้เขียนแค่ท่าทางและบรรยากาศ หรือเสียง Sound Effect ธรรมชาติ (เช่น Ambient sound)
+   - การขยับ: เน้นสั่ง 'Camera motion' และ 'Subject motion' รวบกับ "Clean visual" อย่างกระชับ, ถ่ายแบบ UGC style 
    {video_voice_instruction}
 7. **Task 1 (ข้อมูล JSON อย่างเดียว):** ส่งโครงสร้างบทวิเคราะห์ทั้งหมดมาเป็นดค้ด JSON อย่างเดียวโดยยึดตามโครงสร้างที่กำหนด (ไม่ต้องพยายามสร้างภาพกราฟิก)
 8. **คำสั่งสำคัญเรื่องการตลาด:** หน้าที่ของคุณคือการเป็น Content Creator และนักการตลาดเชี่ยวชาญด้าน Affiliate Marketing บน TikTok โปรดดูภาพสินค้าที่ฉันแนบมานี้ และวิเคราะห์จุดขายเพื่อร่างข้อความโพสต์ใส่ลงใน `tiktok_post_data` ดังนี้
