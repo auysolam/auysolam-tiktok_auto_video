@@ -1,0 +1,10 @@
+[server]
+# เพิ่มระยะเวลาให้ Server รอการเชื่อมต่อ (Ping) จากมือถือได้นานขึ้น
+# ป้องกันแอปดับเวลาสลับไปหน้าเว็บอื่น (หน่วยเป็นวินาที)
+pingInterval = 120
+pingTimeout = 300
+enableCORS = false
+
+[browser]
+gatherUsageStats = false
+
