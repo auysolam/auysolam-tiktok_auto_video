@@ -14,29 +14,74 @@ st.set_page_config(page_title="TikTok Auto Video Generator", page_icon="🎬", l
 # ฉีด Custom CSS เพื่อปรับแต่ง UI ให้สวยงามล้ำสมัยระดับพรีเมียม และรองรับมือถือขั้นสุด (Mobile-First UI)
 st.markdown("""
 <style>
-    /* ฟอนต์ภาษาไทยเพื่อความอ่านง่ายและทันสมัย */
+    :root {
+        --bg-color: #f9fafb;
+        --text-color: #1f2937;
+        --card-bg: #ffffff;
+        --border-color: #e5e7eb;
+        --input-bg: #ffffff;
+        --dropdown-text: #111827;
+        --btn-bg: #ffffff;
+        --btn-hover: #f3f4f6;
+        --btn-active: #e5e7eb;
+        --primary-bg: #fe2c55;
+        --primary-hover: #e6284d;
+        --primary-text: #ffffff;
+        --upload-bg: #F8FAFC;
+        --upload-border: #CBD5E1;
+        --upload-hover: #FFF1F2;
+        --expander-bg: #ffffff;
+        --expander-content: #fafbfc;
+        --code-bg: #f8f9fa;
+        --tab-inactive-bg: #f3f4f6;
+        --tab-inactive-text: #6b7280;
+        --header-color: #1f2937;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --bg-color: #000000;
+            --text-color: #e5e7eb;
+            --card-bg: #121212;
+            --border-color: #333333;
+            --input-bg: #1a1a1a;
+            --dropdown-text: #ffffff;
+            --btn-bg: #1a1a1a;
+            --btn-hover: #333333;
+            --btn-active: #444444;
+            --primary-bg: #fe2c55;
+            --primary-hover: #e6284d;
+            --primary-text: #ffffff;
+            --upload-bg: #111111;
+            --upload-border: #444444;
+            --upload-hover: #1f1115;
+            --expander-bg: #121212;
+            --expander-content: #0a0a0a;
+            --code-bg: #1a1a1a;
+            --tab-inactive-bg: #1a1a1a;
+            --tab-inactive-text: #9ca3af;
+            --header-color: #ffffff;
+        }
+    }
+
     @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
+    
     html, body, [class*="css"] {
         font-family: 'Prompt', sans-serif !important;
-        color: #1f2937 !important;
+        color: var(--text-color) !important;
     }
     
-    /* ซ่อน Header และ Footer พื้นฐานของ Streamlit */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
 
-    /* พื้นหลังแบบ Light Theme เรียบหรู สะอาดตา */
-    .stApp {
-        background-color: #f9fafb;
-    }
+    .stApp { background-color: var(--bg-color); }
 
-    /* ปรับแต่งปุ่มให้ดูโดดเด่นแต่เรียบง่าย */
     .stButton > button {
-        background-color: #ffffff;
-        color: #1f2937 !important;
+        background-color: var(--btn-bg);
+        color: var(--text-color) !important;
         border-radius: 10px; 
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--border-color);
         padding: 0.75rem 1.5rem;
         font-weight: 500;
         font-size: 1.05rem;
@@ -45,80 +90,77 @@ st.markdown("""
         transition: all 0.2s ease;
     }
     .stButton > button:hover {
-        background-color: #f3f4f6;
-        border-color: #d1d5db;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        background-color: var(--btn-hover);
+        border-color: var(--border-color);
     }
     .stButton > button:active {
         transform: translateY(1px);
-        box-shadow: none;
+        background-color: var(--btn-active);
     }
     
-    /* เน้นปุ่มหลัก (Primary Button) สีชมพู TikTok สดใส */
     button[kind="primary"] {
-        background-color: #fe2c55 !important;
-        color: white !important;
-        border-color: #fe2c55 !important;
+        background-color: var(--primary-bg) !important;
+        color: var(--primary-text) !important;
+        border-color: var(--primary-bg) !important;
         box-shadow: 0 4px 6px -1px rgba(254, 44, 85, 0.3) !important;
     }
     button[kind="primary"]:hover {
-        background-color: #e6284d !important;
-        border-color: #e6284d !important;
-        box-shadow: 0 6px 8px -1px rgba(254, 44, 85, 0.4) !important;
+        background-color: var(--primary-hover) !important;
+        border-color: var(--primary-hover) !important;
     }
 
-    /* กล่องข้อมูล (Inputs, Selectbox, Uploader, Text Area) โปร่งสบาย */
     .stTextInput>div>div>input, .stSelectbox>div>div>div, .stNumberInput>div>div>input, .stTextArea>div>div>textarea {
         border-radius: 10px !important;
-        border: 1px solid #d1d5db !important;
-        background-color: #ffffff !important;
+        border: 1px solid var(--border-color) !important;
+        background-color: var(--input-bg) !important;
         padding: 0.6rem 1rem !important;
-        font-size: 16px !important; /* ป้องกัน iOS ซูมหน้าจอ */
-        color: #111827 !important;
+        font-size: 16px !important;
+        color: var(--dropdown-text) !important;
         transition: all 0.2s ease;
-        box-shadow: inset 0 1px 2px rgba(0,0,0,0.01) !important;
     }
     .stTextInput>div>div>input:focus, .stSelectbox>div>div>div:focus, .stTextArea>div>div>textarea:focus {
-        border-color: #fe2c55 !important;
+        border-color: var(--primary-bg) !important;
         box-shadow: 0 0 0 2px rgba(254, 44, 85, 0.2) !important;
     }
 
-    /* Expander Cards (การ์ดหัวข้อแบบลอยขึ้นมาแบบ Clean White) */
     div[data-testid="stExpander"] {
-        border: 1px solid #e5e7eb !important;
+        border: 1px solid var(--border-color) !important;
         border-radius: 12px !important;
-        background-color: #ffffff !important;
+        background-color: var(--expander-bg) !important;
         margin-bottom: 1rem !important;
         overflow: hidden;
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
     }
     .streamlit-expanderHeader {
         background-color: transparent !important;
         font-weight: 600 !important;
         font-size: 1.1rem !important;
         padding: 16px 20px !important;
-        color: #111827 !important;
+        color: var(--dropdown-text) !important;
     }
     div[data-testid="stExpanderDetails"] {
         padding: 1.2rem 1rem !important;
-        background-color: #fafbfc !important;
-        border-top: 1px solid #f3f4f6;
+        background-color: var(--expander-content) !important;
+        border-top: 1px solid var(--border-color);
     }
 
-    /* ปรับ File Uploader ดีไซน์มินิมอลสะอาดตา */
     .stFileUploader>div>div {
         border-radius: 16px !important;
-        background-color: #F8FAFC !important;
-        border: 2px dashed #CBD5E1 !important;
+        background-color: var(--upload-bg) !important;
+        border: 2px dashed var(--upload-border) !important;
         padding: 2.5rem !important;
         transition: all 0.2s ease;
     }
     .stFileUploader>div>div:hover {
-        border-color: #fe2c55 !important;
-        background-color: #FFF1F2 !important;
+        border-color: var(--primary-bg) !important;
+        background-color: var(--upload-hover) !important;
     }
 
-    /* กรอบข้อความแจ้งเตือนต่างๆ */
+    div[data-testid="stCodeBlock"], div[data-testid="stCodeBlock"] pre {
+        border-radius: 10px !important;
+        background-color: var(--code-bg) !important;
+        border: 1px solid var(--border-color) !important;
+    }
+    
     div[data-testid="stAlert"] {
         border-radius: 10px !important;
         border: none !important;
@@ -126,82 +168,27 @@ st.markdown("""
         box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
     }
 
-    /* พื้นที่แสดงผลซอร์สโค้ด (st.code) ให้โค้งมนและสวยงาม */
-    div[data-testid="stCodeBlock"] {
-        border-radius: 10px !important;
-        overflow: hidden !important;
-        border: 1px solid #e5e7eb !important;
-        background-color: #f8f9fa !important;
-    }
-    div[data-testid="stCodeBlock"] pre {
-        background-color: #f8f9fa !important;
-    }
-
-    /* 📱 จัดการเฉพาะหน้าจอมือถือ (Mobile Perfect Fit UX) */
     @media (max-width: 768px) {
-        .block-container {
-            padding-top: 2rem !important;
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
-            padding-bottom: 4rem !important;
-        }
+        .block-container { padding: 2rem 1rem 4rem 1rem !important; }
+        h1 { font-size: 1.8rem !important; color: var(--header-color) !important; font-weight: 700 !important; line-height: 1.3 !important; }
+        h2 { font-size: 1.3rem !important; color: var(--text-color) !important; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem !important; margin-top: 1.5rem !important;}
+        h3 { font-size: 1.15rem !important; color: var(--text-color) !important; }
         
-        /* ปรับหัวข้อใหญ่สุด เรียบง่าย */
-        h1 {
-            font-size: 1.8rem !important;
-            text-align: left;
-            margin-bottom: 0.5rem !important;
-            line-height: 1.3 !important;
-            font-weight: 700 !important;
-            color: #1f2937 !important;
-        }
-        
-        /* ปรับระดับหัวรอง */
-        h2 {
-            font-size: 1.3rem !important;
-            margin-top: 1.5rem !important;
-            padding-bottom: 0.5rem !important;
-            border-bottom: 1px solid #e5e7eb;
-            color: #374151 !important;
-        }
-        
-        h3 {
-            font-size: 1.15rem !important;
-            color: #4b5563 !important;
-        }
-
-        /* ขยายระยะสัมผัส (Touch Target) ของตัวเลือก Checkbox/Radio ให้กดง่ายในมือถือ */
         .stCheckbox>label>div[data-testid="stMarkdownContainer"]>p, 
         .stRadio>label>div[data-testid="stMarkdownContainer"]>p {
-            font-size: 1.1rem !important;
-            padding: 10px 0;
-            line-height: 1.4;
-            color: #374151 !important;
+            font-size: 1.1rem !important; color: var(--dropdown-text) !important; padding: 10px 0;
         }
-
-        /* ปุ่มต่างๆ ให้กดง่ายเต็มความกว้างจอ (Full Width) */
-        .stButton > button {
-            width: 100% !important;
-            padding: 1rem !important;
-            font-size: 1.15rem !important;
-            margin-top: 0.5rem;
-        }
-
-        /* Tab เลือกซีนวิดีโอ (Tabs) ขยายใหญ่เป็นปุ่มเมนูให้แตะง่ายๆ */
+        .stButton > button { width: 100% !important; padding: 1rem !important; font-size: 1.15rem !important; }
+        
         button[data-baseweb="tab"] {
-            font-size: 1.1rem !important;
-            padding: 1rem 1.2rem !important;
-            margin-right: 0.5rem !important;
-            background-color: #f3f4f6 !important;
-            border-radius: 10px 10px 0 0 !important;
+            font-size: 1.1rem !important; padding: 1rem 1.2rem !important; margin-right: 0.5rem !important;
+            background-color: var(--tab-inactive-bg) !important; border-radius: 10px 10px 0 0 !important;
+            color: var(--tab-inactive-text) !important;
             border-bottom: 2px solid transparent !important;
-            color: #6b7280 !important;
         }
         button[data-baseweb="tab"][aria-selected="true"] {
-            background-color: #ffffff !important;
-            border-bottom: 2px solid #fe2c55 !important;
-            color: #fe2c55 !important;
-            font-weight: 600 !important;
+            background-color: var(--card-bg) !important; border-bottom: 2px solid var(--primary-bg) !important;
+            color: var(--primary-bg) !important; font-weight: 600 !important;
         }
     }
 </style>
