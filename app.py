@@ -512,7 +512,7 @@ if uploaded_file:
                                 script_instruction = '3. **ห้ามแต่งบทพูดเด็ดขาด (No Voiceover)** ให้ปล่อยฟิลด์ script ว่างไว้ หรือเขียนเพียงแค่ "[ดนตรีบรรเลงเร้าใจ]"'
                                 video_voice_instruction = '- **Focus video prompt:** "Cinematic visual storytelling, natural aesthetic"'
 
-                    consistent_char_phrase = "" if no_char_mode else "Consistent generic character model in every scene, consistent facial features, hair, and clothing, "
+                    consistent_char_phrase = "" if no_char_mode else "Consistent generic character model in every scene, perfectly consistent facial features, hair, and EXACTLY IDENTICAL CLOTHING/OUTFIT in all scenes, "
 
                     if no_char_mode or "คนจริง" in char_style:
                         image_style_instruction = '   - **สไตล์ภาพถ่ายสุดเรียล:** ให้ระบุใน prompt ว่า "Realistic smartphone lifestyle photo, clear background depth, sharp focus on subject." เพื่อให้ภาพดูสมจริง'
@@ -544,9 +544,9 @@ if uploaded_file:
    - **สำคัญมาก (การติดป้ายชื่อซีน):** บังคับให้คุณขึ้นต้นประโยคแรกของ `image_prompt` ทุกซีนด้วยคำว่า "Scene 1: ", "Scene 2: " ... ตามลำดับซีนเสมอ (เช่น "Scene 1: Vertical 9:16 aspect ratio...")
    - บังคับให้ใส่: "Vertical 9:16 aspect ratio, {consistent_char_phrase}NO text overlays, NO typography, ONLY one single distinct scene, NO 4-panel grid, NO split screen"
    - **กฎการแยกภาพ (No Grid/Collage):** ห้ามให้ AI เจนภาพ 4 ซีนรวมอยู่ในรูปเดียว (กากบาท/ตาราง 4 ช่อง) อย่างเด็ดขาด! บังคับเขียนสั่งท้าย prompt ว่า "Single full frame, absolutely NO multi-panel collage"
-   - **กฎการล็อกเป้า 100% (CRITICAL UNIFIED CORE_PROMPT):** คุณต้องรวบรวมรายละเอียดทั้งหมด ได้แก่ 1) การกำหนดสรีระรูปลักษณ์แบบเจาะจง (เช่น "A 25yo confident Asian female model with short black bob hair wearing a white t-shirt" **ห้ามตั้งชื่อบุคคลเฉพาะให้ตัวละครเด็ดขาดเพื่อป้องกัน AI บล็อกคำสั่ง**) เพื่อใช้เป็นกุญแจล็อคหน้าตาและชุดให้คล้ายเดิม 2) ลักษณะของรูปภาพสินค้า (อักษร ลายพิมพ์ สี) แบบละเอียดโคตรๆ และ 3) ฉากหลังที่เจาะจงมาก (เช่น A specific modern kitchen) 
+   - **กฎการล็อกเป้า 100% (CRITICAL UNIFIED CORE_PROMPT):** คุณต้องรวบรวมรายละเอียดทั้งหมด ได้แก่ 1) การกำหนดสรีระและการแต่งกายแบบตายตัวเป๊ะๆ (เช่น "A 25yo confident Asian female model with short black bob hair wearing exactly the same white t-shirt and blue jeans" **ห้ามตั้งชื่อบุคคล และต้องระบุชุดเครื่องแต่งกายให้เหมือนกันทุกซีนเป๊ะๆ ห้ามเปลี่ยนชุดตัวละครเด็ดขาด**) เพื่อล็อคหน้าตาและชุดให้เหมือนเดิม 100% ตลอดทั้งคลิป 2) ลักษณะของรายละเอียดสินค้าแบบละเอียดโคตรๆ และ 3) ฉากหลังสถานที่ 
    - นำข้อมูลทั้ง 3 ข้อด้านบนมาแต่งรวมกันเป็น 1 ย่อหน้า เรียกว่า `[CORE_PROMPT]` และ **คุณมีหน้าที่เรียงลำดับดังนี้: ขึั้นต้นด้วย "Scene X: " เป็นคำแรกสุด จากนั้นเว้นวรรคและตามด้วย `[CORE_PROMPT]` เป็นย่อหน้าแรกสุดใน `image_prompt` ของทุกๆ ซีนย่อย ห้ามตกหล่นแม้แต่ตัวอักษรเดียว! (ห้ามเอาอะไรมาบังหน้าคำว่า Scene X: เด็ดขาด)**
-   - ส่วนที่เปลี่ยนได้ในแต่ละซีน คือแค่ "ท่าทางโพส (Pose)" และ "มุมกล้อง (Camera Angle)" ต่อท้าย `[CORE_PROMPT]` เท่านั้น! เพื่อบังคับให้ AI สร้างภาพ นางแบบเดิม ฉากเดิม สินค้าเดิม ตลอดทั้งคลิป!
+   - ส่วนที่เปลี่ยนได้ในแต่ละซีน คือแค่ "ท่าทางโพส (Pose)" และ "มุมกล้อง (Camera Angle)" ต่อท้าย `[CORE_PROMPT]` เท่านั้น! เพื่อบังคับให้ AI สร้างภาพ นางแบบเดิม ชุดแต่งกายเดิมเป๊ะ ฉากเดิม สินค้าเดิม ตลอดทั้งคลิป! (ห้ามสวมเสื้อคลุมทับ หมวกพิ่ม หรือเปลี่ยนกางเกง/กระโปรงใดๆ ระหว่างซีนเด็ดขาด)
    - **กฎเหล็กเพื่อความชัด (ห้ามเบลอฉากหลังเด็ดขาด):** บังคับให้ทุกประโยค `image_prompt` จบด้วยคำสั่งนี้เสมอ: "Taken with an ordinary smartphone camera, zero portrait mode. The background environment MUST BE 100% crystal clear and fully visible in sharp focus. Extreme deep depth of field, absolutely NO bokeh, NO background blur at all, perfectly sharp scenery background. Correct anatomical hands."
 {image_style_instruction}
    - บรรยายแสงเงา บรรยากาศ มุมกล้อง ให้เป็นแบบ "แสงธรรมชาติทั่วไป (Natural daily lighting)" ห้ามจัดแสงสวยหรูแบบสตูดิโอเด็ดขาด และห้ามสั่งให้วาดป้ายตะกร้าสินค้า (Shopping cart icons), ป้ายราคา, ไอคอน UI หรือข้อความทับลงไปในภาพเด็ดขาด
