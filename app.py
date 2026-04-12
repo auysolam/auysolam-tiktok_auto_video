@@ -18,6 +18,7 @@ st.markdown("""
     @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
     html, body, [class*="css"] {
         font-family: 'Prompt', sans-serif !important;
+        color: #1f2937 !important;
     }
     
     /* ซ่อน Header และ Footer พื้นฐานของ Streamlit */
@@ -25,103 +26,115 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
 
-    /* พื้นหลังแบบ Dark Theme เรียบหรู สะอาดตา (พรีเมียมแบบ Flat) */
+    /* พื้นหลังแบบ Light Theme เรียบหรู สะอาดตา */
     .stApp {
-        background-color: #121212;
+        background-color: #f9fafb;
     }
 
-    /* ปรับแต่งปุ่มให้ดูโดดเด่นแต่เรียบง่าย ไม่เรืองแสง */
+    /* ปรับแต่งปุ่มให้ดูโดดเด่นแต่เรียบง่าย */
     .stButton > button {
-        background-color: #333333;
-        color: white !important;
-        border-radius: 8px; /* โค้งมนกำลังดี */
-        border: 1px solid #444444;
+        background-color: #ffffff;
+        color: #1f2937 !important;
+        border-radius: 10px; 
+        border: 1px solid #e5e7eb;
         padding: 0.75rem 1.5rem;
         font-weight: 500;
         font-size: 1.05rem;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.2px;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         transition: all 0.2s ease;
     }
     .stButton > button:hover {
-        background-color: #4a4a4a;
-        border-color: #666666;
+        background-color: #f3f4f6;
+        border-color: #d1d5db;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
     .stButton > button:active {
-        background-color: #2a2a2a;
         transform: translateY(1px);
+        box-shadow: none;
     }
     
-    /* เน้นปุ่มหลัก (Primary Button) ให้เป็นสีหลักของแอป เช่น ชมพู TikTok หม่นๆ เพื่อความมินิมอล */
+    /* เน้นปุ่มหลัก (Primary Button) สีชมพู TikTok สดใส */
     button[kind="primary"] {
-        background-color: #e62e5c !important;
-        border-color: #e62e5c !important;
+        background-color: #fe2c55 !important;
+        color: white !important;
+        border-color: #fe2c55 !important;
+        box-shadow: 0 4px 6px -1px rgba(254, 44, 85, 0.3) !important;
     }
     button[kind="primary"]:hover {
-        background-color: #d12250 !important;
+        background-color: #e6284d !important;
+        border-color: #e6284d !important;
+        box-shadow: 0 6px 8px -1px rgba(254, 44, 85, 0.4) !important;
     }
 
-    /* กล่องข้อมูล (Inputs, Selectbox, Uploader, Text Area) เรียบหรูไม่เรืองแสง */
+    /* กล่องข้อมูล (Inputs, Selectbox, Uploader, Text Area) โปร่งสบาย */
     .stTextInput>div>div>input, .stSelectbox>div>div>div, .stNumberInput>div>div>input, .stTextArea>div>div>textarea {
-        border-radius: 8px !important;
-        border: 1px solid #333333 !important;
-        background-color: #1e1e1e !important;
+        border-radius: 10px !important;
+        border: 1px solid #d1d5db !important;
+        background-color: #ffffff !important;
         padding: 0.6rem 1rem !important;
-        font-size: 16px !important; /* บังคับ 16px ป้องกันระบบ iOS ซูมหน้าจออัตโนมัติเวลากดพิมพ์! */
-        color: white !important;
-        transition: border-color 0.2s ease;
+        font-size: 16px !important; /* ป้องกัน iOS ซูมหน้าจอ */
+        color: #111827 !important;
+        transition: all 0.2s ease;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.01) !important;
     }
     .stTextInput>div>div>input:focus, .stSelectbox>div>div>div:focus, .stTextArea>div>div>textarea:focus {
-        border-color: #888888 !important;
-        box-shadow: none !important;
+        border-color: #fe2c55 !important;
+        box-shadow: 0 0 0 2px rgba(254, 44, 85, 0.2) !important;
     }
 
-    /* Expander Cards (การ์ดหัวข้อแบบลอยขึ้นมาแบบ Clean) */
+    /* Expander Cards (การ์ดหัวข้อแบบลอยขึ้นมาแบบ Clean White) */
     div[data-testid="stExpander"] {
-        border: 1px solid #2a2a2a !important;
+        border: 1px solid #e5e7eb !important;
         border-radius: 12px !important;
-        background-color: #181818 !important;
+        background-color: #ffffff !important;
         margin-bottom: 1rem !important;
         overflow: hidden;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
     }
     .streamlit-expanderHeader {
         background-color: transparent !important;
-        font-weight: 500 !important;
+        font-weight: 600 !important;
         font-size: 1.1rem !important;
         padding: 16px 20px !important;
+        color: #111827 !important;
     }
     div[data-testid="stExpanderDetails"] {
         padding: 1.2rem 1rem !important;
-        background-color: #121212 !important;
-        border-top: 1px solid #2a2a2a;
+        background-color: #fafbfc !important;
+        border-top: 1px solid #f3f4f6;
     }
 
-    /* ปรับ File Uploader ดีไซน์มินิมอล */
+    /* ปรับ File Uploader ดีไซน์มินิมอลสะอาดตา */
     .stFileUploader>div>div {
-        border-radius: 12px !important;
-        background-color: #1a1a1a !important;
-        border: 1px dashed #555555 !important;
-        padding: 2rem !important;
+        border-radius: 16px !important;
+        background-color: #F8FAFC !important;
+        border: 2px dashed #CBD5E1 !important;
+        padding: 2.5rem !important;
         transition: all 0.2s ease;
     }
     .stFileUploader>div>div:hover {
-        border-color: #888888 !important;
-        background-color: #222222 !important;
+        border-color: #fe2c55 !important;
+        background-color: #FFF1F2 !important;
     }
 
     /* กรอบข้อความแจ้งเตือนต่างๆ */
     div[data-testid="stAlert"] {
-        border-radius: 8px !important;
-        border: 1px solid #333333 !important;
-        background-color: #1e1e1e !important;
+        border-radius: 10px !important;
+        border: none !important;
         padding: 1rem !important;
+        box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
     }
 
     /* พื้นที่แสดงผลซอร์สโค้ด (st.code) ให้โค้งมนและสวยงาม */
     div[data-testid="stCodeBlock"] {
-        border-radius: 8px !important;
+        border-radius: 10px !important;
         overflow: hidden !important;
-        border: 1px solid #2a2a2a !important;
-        background-color: #1e1e1e !important;
+        border: 1px solid #e5e7eb !important;
+        background-color: #f8f9fa !important;
+    }
+    div[data-testid="stCodeBlock"] pre {
+        background-color: #f8f9fa !important;
     }
 
     /* 📱 จัดการเฉพาะหน้าจอมือถือ (Mobile Perfect Fit UX) */
@@ -133,13 +146,14 @@ st.markdown("""
             padding-bottom: 4rem !important;
         }
         
-        /* ปรับหัวข้อใหญ่สุด เรียบง่าย ไม่มลทิน */
+        /* ปรับหัวข้อใหญ่สุด เรียบง่าย */
         h1 {
             font-size: 1.8rem !important;
             text-align: left;
             margin-bottom: 0.5rem !important;
             line-height: 1.3 !important;
-            font-weight: 600 !important;
+            font-weight: 700 !important;
+            color: #1f2937 !important;
         }
         
         /* ปรับระดับหัวรอง */
@@ -147,11 +161,13 @@ st.markdown("""
             font-size: 1.3rem !important;
             margin-top: 1.5rem !important;
             padding-bottom: 0.5rem !important;
-            border-bottom: 1px solid #2a2a2a;
+            border-bottom: 1px solid #e5e7eb;
+            color: #374151 !important;
         }
         
         h3 {
             font-size: 1.15rem !important;
+            color: #4b5563 !important;
         }
 
         /* ขยายระยะสัมผัส (Touch Target) ของตัวเลือก Checkbox/Radio ให้กดง่ายในมือถือ */
@@ -160,6 +176,7 @@ st.markdown("""
             font-size: 1.1rem !important;
             padding: 10px 0;
             line-height: 1.4;
+            color: #374151 !important;
         }
 
         /* ปุ่มต่างๆ ให้กดง่ายเต็มความกว้างจอ (Full Width) */
@@ -175,15 +192,16 @@ st.markdown("""
             font-size: 1.1rem !important;
             padding: 1rem 1.2rem !important;
             margin-right: 0.5rem !important;
-            background-color: #1e1e1e !important;
-            border-radius: 8px 8px 0 0 !important;
+            background-color: #f3f4f6 !important;
+            border-radius: 10px 10px 0 0 !important;
             border-bottom: 2px solid transparent !important;
+            color: #6b7280 !important;
         }
         button[data-baseweb="tab"][aria-selected="true"] {
-            background-color: #2a2a2a !important;
-            border-bottom: 2px solid #e62e5c !important;
-            color: white !important;
-            font-weight: 500 !important;
+            background-color: #ffffff !important;
+            border-bottom: 2px solid #fe2c55 !important;
+            color: #fe2c55 !important;
+            font-weight: 600 !important;
         }
     }
 </style>
@@ -262,7 +280,7 @@ if uploaded_file:
                 ]
 
                 if fashion_mode or seller_mode:
-                    fashion_item_type = st.selectbox("👗 2.1.2 ประเภทสินค้าแฟชั่น", ["เสื้อ (Tops)", "กางเกง/กระโปรง (Bottoms)", "ชุดเดรส/ชุดเซท (Dress/Sets)", "กระเป๋า (Bags)", "รองเท้า (Shoes)", "หมวก/เครื่องประดับ (Accessories)", "อื่นๆ"])
+                    fashion_item_type = st.selectbox("👗 2.1.2 ประเภทสินค้าแฟชั่น", ["เสื้อ (Tops)", "กางเกง/กระโปรง (Bottoms)", "ชุดเสื้อและกางเกง (Top and Bottom Set)", "ชุดเดรส/ชุดเซท (Dress/Sets)", "กระเป๋า (Bags)", "รองเท้า (Shoes)", "หมวก/เครื่องประดับ (Accessories)", "อื่นๆ"])
                     if fashion_item_type == "อื่นๆ":
                         fashion_item_type = st.text_input("ระบุประเภทสินค้าแฟชั่นอื่นๆ:")
                     
@@ -423,7 +441,10 @@ if uploaded_file:
                                 video_voice_instruction = '- **Focus video prompt:** "Cinematic product b-roll with energetic background feeling"'
                     elif fashion_mode:
                         # แยกประเภทสินค้าเพื่อกำหนดฉากเจาะจง
-                        if "เสื้อ" in fashion_item_type:
+                        if "ชุด" in fashion_item_type or "เซท" in fashion_item_type:
+                            focus_target = "ชุดแฟชั่นแบบเต็มตัว (Full Outfit/Set)"
+                            pan_target = "ภาพเต็มตัวเพื่อให้เห็นสไตล์และองค์ประกอบของชุดทั้งบนและล่าง"
+                        elif "เสื้อ" in fashion_item_type:
                             focus_target = "เสื้อ (Tops)"
                             pan_target = "แพนครึ่งตัวเห็นด้านบน ที่สวมใส่เสื้อ"
                         elif "กางเกง" in fashion_item_type or "กระโปรง" in fashion_item_type:
@@ -474,7 +495,7 @@ if uploaded_file:
                         char_rule = f"- โหมดบรรยากาศร้านขายเสื้อผ้า (สินค้า: {fashion_item_type} สำหรับ: {target_audience}): เน้นฉากในร้านขายเสื้อผ้า สเกลหรือลักษณะสินค้าต้องสะท้อนว่าเป็นของ {target_audience} ชัดเจน เช่น ถ้าเป็นเสื้อผ้าเด็ก ตัวเสื้อ/กางเกงที่โชว์ต้องมีขนาดเล็กจิ๋วพอดีสำหรับเด็ก (ฉากหลังต้องชัดเจนกว้างขวาง Absolutely NO background blur, deep depth of field)\\n- ตัวละครหลักพ่อค้า/แม่ค้า: {char_type} (แต่งกายเข้ากับสินค้า)\\n- สีผิว: {char_skin}\\n- บุคลิกภาพ: {traits_str}\\n- **กฎตัวละครและสินค้า:** สร้างหน้าตาคนใหม่หมด แต่ 'ตัวสินค้า' ต้องเหมือนรูปเป๊ะๆ 100% {presentation_detail} โดยรูปทรงต้องเหมือนต้นฉบับ 100% แต่สเกลขนาดปรับให้เข้ากับ {target_audience}\\n"
                         scene_rule = f"2. การจัดลำดับภาพแต่ละซีน:\\n   - ซีนช็อตที่ 1: {scene_1_desc}\\n   - ซีนช็อตที่ 2: {scene_2_desc}\\n   - ซีนช็อตที่ 3: {scene_3_desc}\\n   - ซีนช็อตที่ 4: {scene_4_desc}\\n   (หากมีมากกว่า 4 ซีน ให้สลับหมุนเวียนให้เป็นธรรมชาติและโชว์สินค้าให้มากที่สุด)\\n"
                         
-                        seller_motion_instruction = f'\\n   - **ท่าทางการเคลื่อนไหวภาพ:** ขยับแบบนักขายกำลังรีวิวสินค้า "Natural energetic seller movement, reviewing product details, real-time speed, crisp focus"'
+                        seller_motion_instruction = f'\\n   - **ท่าทางการเคลื่อนไหวภาพ:** ขยับแบบนักขายกำลังรีวิวสินค้า "Natural energetic seller movement, reviewing product details, real-time speed, crisp focus". หากมีการถือไม้แขวนเสื้อ ให้บังคับพิมพ์กำชับลงใน video_prompt ด้วยว่า "Both hands MUST firmly hold the hangers continuously. Hangers and clothes must NOT float in the air when hands move."'
                         
                         if no_voiceover:
                             char_rule += "- **ย้ำ: ไม่ต้องคิดบทพูด (Voiceover) เด็ดขาด**\\n"
@@ -525,7 +546,7 @@ if uploaded_file:
 {scene_rule}
 {script_instruction}
    - **กฎการพากย์เสียง (CRITICAL SCRIPTING):** เขียนบทพากย์ให้สะท้อนเอกลักษณ์ของ 'Voice Persona ({voice_type})' และ 'อารมณ์น้ำเสียง ({voice_emotion})' แบบสุดโต่ง 100%! บังคับใช้คำแสลง, วิธีการพูด, และรูปประโยคที่แตกต่างกันไปตานคาแรคเตอร์ (ห้ามเขียนแพทเทิร์นพากย์ซ้ำเดิมจำเจเด็ดขาด ต้อง Unique ทุกครั้ง)
-{f"4. **ไม่ต้องเขียนบทพากย์** แต่ละซีนมีความยาว {scene_duration} วินาที" if no_voiceover else f"4. เขียนบทพากย์ให้สามารถพูดจบได้ภายใน {scene_duration} วินาทีต่อซีน"}
+{f"4. **ไม่ต้องเขียนบทพากย์** แต่ละซีนมีความยาว {scene_duration} วินาที" if no_voiceover else f"4. **กฎเหล็กเรื่องความเร็วเสียง (CRITICAL PACING):** เขียนบทพากย์ด้วยจำนวนพยางค์ที่เท่าๆ กันทุกซีน (ประมาณ {scene_duration * 2} ถึง {int(scene_duration * 2.5)} คำ/พยางค์ ต่อซีน) เพื่อให้ใช้เวลาพูด {scene_duration} วินาทีพอดีเป๊ะ ห้ามมีซีนไหนยาวหรือสั้นกว่าเพื่อนเด็ดขาด เพื่อป้องกันปัญหาเสียงพากย์เร็วหรือช้าไม่เท่ากัน"}
 5. เขียน image_prompt เป็นภาษาอังกฤษ เพื่อใช้ **เจนภาพนิ่งด้วย Gemini (Imagen 3)**
    - **สำคัญมาก (การติดป้ายชื่อซีน):** บังคับให้คุณขึ้นต้นประโยคแรกของ `image_prompt` ทุกซีนด้วยคำว่า "Scene 1: ", "Scene 2: " ... ตามลำดับซีนเสมอ (เช่น "Scene 1: Vertical 9:16 aspect ratio...")
    - บังคับให้ใส่: "Vertical 9:16 aspect ratio, {consistent_char_phrase}NO text overlays, NO typography, ONLY one single distinct scene, NO 4-panel grid, NO split screen"
@@ -535,14 +556,14 @@ if uploaded_file:
    - ส่วนที่เปลี่ยนได้ในแต่ละซีน คือแค่ "ท่าทางโพส (Pose)" และ "มุมกล้อง (Camera Angle)" ต่อท้าย `[CORE_PROMPT]` เท่านั้น! เพื่อบังคับให้ AI สร้างภาพ นางแบบเดิม ฉากเดิม สินค้าเดิม ตลอดทั้งคลิป!
    - **กฎเหล็กเพื่อความชัด (ห้ามเบลอฉากหลังเด็ดขาด):** บังคับให้ทุกประโยค `image_prompt` จบด้วยคำสั่งนี้เสมอ: "Taken with an ordinary smartphone camera, zero portrait mode. The background environment MUST BE 100% crystal clear and fully visible in sharp focus. Extreme deep depth of field, absolutely NO bokeh, NO background blur at all, perfectly sharp scenery background. Correct anatomical hands."
 {image_style_instruction}
-   - บรรยายแสงเงา บรรยากาศ มุมกล้อง ให้เป็นแบบ "แสงธรรมชาติทั่วไป (Natural daily lighting)" ห้ามจัดแสงสวยหรูแบบสตูดิโอเด็ดขาด และห้ามสั่งให้วาดป้ายราคาหรือข้อความทับลงไปในภาพเด็ดขาด
+   - บรรยายแสงเงา บรรยากาศ มุมกล้อง ให้เป็นแบบ "แสงธรรมชาติทั่วไป (Natural daily lighting)" ห้ามจัดแสงสวยหรูแบบสตูดิโอเด็ดขาด และห้ามสั่งให้วาดป้ายตะกร้าสินค้า (Shopping cart icons), ป้ายราคา, ไอคอน UI หรือข้อความทับลงไปในภาพเด็ดขาด
 6. เขียน video_prompt เป็นภาษาอังกฤษ สำหรับ **เจนวนิเมชัน+เสียง บน Google Labs Flow**
 {video_style_instruction}
    - ไม่ต้องขึ้นต้นด้วย "Scene X:" ใน `video_prompt` เพราะอาจทำให้ Flow ค้าง ให้เขียนคำสั่งภาพไปเลยตรงๆ
    - **ความเร็วและมุมกล้อง:** ให้ย้ำว่า "Normal speed cinematic camera motion." เน้นขยับกล้องเฉพาะด้านหน้า (Front view only) 
    - **หลีกเลี่ยงการใช้คำปฏิเสธเยอะๆ เช่น NO NO NO** เพราะจะทำให้ AI Model บล็อกคำสั่ง ให้เขียนบรรยายสิ่งที่ต้องการเห็นแทน เช่น "Clear footage, perfectly sharp" 
    - **ห้ามสั่ง AI ให้พากย์เสียงคนพูดเด็ดขาด (No voiceover requests in prompt)** เพราะเป็นข้อห้ามของระบบ Video AI และจะค้าง 99% ให้เขียนแค่ท่าทางและบรรยากาศ หรือเสียง Sound Effect ธรรมชาติ (เช่น Ambient sound)
-   - การขยับ: เน้นสั่ง 'Camera motion' และ 'Subject motion' รวบกับ "Clean visual" อย่างกระชับ, ถ่ายแบบ UGC style 
+   - การขยับ: เน้นสั่ง 'Camera motion' และ 'Subject motion' รวบกับ "Clean visual" อย่างกระชับ, ถ่ายแบบ UGC style โดยกำชับว่าภาพต้องคลีน "Clean visual without any text or UI, absolutely NO shopping cart icons, NO banners, NO text elements"
    {video_voice_instruction}
 7. **Task 1 (ข้อมูล JSON อย่างเดียว):** ส่งโครงสร้างบทวิเคราะห์ทั้งหมดมาเป็นดค้ด JSON อย่างเดียวโดยยึดตามโครงสร้างที่กำหนด (ไม่ต้องพยายามสร้างภาพกราฟิก)
 8. **คำสั่งสำคัญเรื่องการตลาด:** หน้าที่ของคุณคือการเป็น Content Creator และนักการตลาดเชี่ยวชาญด้าน Affiliate Marketing บน TikTok โปรดดูภาพสินค้าที่ฉันแนบมานี้ และวิเคราะห์จุดขายเพื่อร่างข้อความโพสต์ใส่ลงใน `tiktok_post_data` ดังนี้
